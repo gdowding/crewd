@@ -1,0 +1,39 @@
+#!/usr/bin/env cbqn
+# -*- mode: bqn -*-
+# [[file:../crewd.org::crewd][crewd]]
+
+data ← •Import "data.bqn"
+Error ← { 𝕩: •Out "error: " ∾ 𝕩}
+Help ← {
+"help":
+     help ← ⟨
+     "commands:"
+     "  help: print this message then exit."
+     "  roster: print the roster"
+     ⟩
+ # Join message with lf and call out. Don't think it is possible to apply •Out over a list
+ lf ← @+10
+ h ← ∾lf∾¨help
+ •Out h
+}
+
+# run command or output help
+# no command -> error missing command; help
+# help -> help
+# roster -> roster
+•Show ≠•args
+•Show (≠•args)<1
+
+{ ((≠•args)<1)?
+  Error "missing 'command'"
+  Help "help"
+  •Exit 1
+  ; @
+}
+cmd ← ⊑ •args
+•Out cmd
+Help cmd
+•Show data
+•Show data.roster
+•Show data.events
+•Show data.MergeNames data.events

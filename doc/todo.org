@@ -1,0 +1,115 @@
+* TODO figure out why org is prefixing summaries with 'S:' in ics :annoyance:
+
+** input
+#+begin_example
+    * Practice
+    ** Practices
+    *** Practice 1
+    SCHEDULED: <2026-02-07 Sat>
+    * Snowbird 2025-2026
+    :PROPERTIES:
+    :SERIES:   snowbird
+    :EVENT_PAGE: https://www.styc.org/Snowbird-Series
+    :SPONSOR:  Sloop Tavern Yacht Club
+    :END:
+#+end_example
+
+** output
+#+begin_example
+BEGIN:VEVENT
+DTSTAMP:20260112T064657Z
+UID:SC-DC88E6BB-11FA-45AB-BD8A-4E6BA1A39527
+DTSTART;VALUE=DATE:20260207
+DTEND;VALUE=DATE:20260208
+SUMMARY:S: Practice 1
+CATEGORIES:series
+END:VEVENT
+#+end_example
+
+
+** better output format for urls
+
+#+begin_src elisp
+
+#+end_src
+
+* add
+- [X] pitch regatta
+- [X] grand prix
+- [X] sloop fall regatta
+- [X] foul weather bluff
+- [X] pssc big boat
+- [X] round the county
+- [X] swiftsure
+- [X] wath
+- [ ] winter vashon
+- [ ] 2026 snowbird
+
+
+* TODO calendar output
+
+* TODO crew
+
+way for people to easily manage their sign ups
+
+syncronize between org file and spreadsheet
+
+* create a calendar for import
+
+* sign ups
+
+- want to have a way to get people to sign up for races
+- don't want to force people to sign up for the whole year maybe just the current month and next three months window
+- give option for people to go through the whole schedule
+- remind people when deadline is approaching
+- for series, preference is for people to sign up for entire series
+- bring together all sign ups into schedule
+- notify people through email, signal.
+
+** TODO get list of series that have races in the next three months
+
+** TODO get people to sign up for upcoming races
+- [ ] synchronize changes between crew list spreadsheet and crew-list.org
+  - [ ] convert csv to org-mode
+  - [ ] when updating make changes to csv then update org
+  - when would I make changes to org the update csv?
+    - I guess the goal is to use org as the management data format
+    - In the future there might be a web app that captures changes automatically.
+- [ ] certian races need signup deadlines
+- [ ] generate a sign up spreadsheet and upload to google sheets
+
+
+
+** TODO Create sign up for a series
+
+** TODO Notify people that schedule is available and crew needed
+
+** TODO When near race time notifiy people that are signed up and provide them with additional information
+- dock time
+
+** TODO add weather and tide predictions
+- [ ] add location for race
+- [ ] add link to tide predicitons or fetch data for predcitions or both
+
+
+* sprint 1
+SCHEDULED: <2026-02-07 Sat>
+** TODO read csv schedule and display on web page
+- [X] created lib file to read csv
+- [X] rewrite page using builder syntax
+- [ ] see if I can get bazel to build leptos -- or maybe just skip that
+- [X] set use data lib in ui to get Vec of events
+- [ ] display events in list or table
+** TODO deploy to some provider
+** TODO share with team
+
+** DONE refactor into workspace project
+SCHEDULED: <2026-02-15 Sun>
+
+having some problems adding business logic and running tests within the leptos context. I wil split out the business logic to a separate crate so I can use normal rust tools to test, etc.
+
+
+This is mostly done. I have an error due to profile being set in child project instead of main project
+
+** TODO add a main to data to output the schedule to the console
+SCHEDULED: <2026-02-15 Sun>
