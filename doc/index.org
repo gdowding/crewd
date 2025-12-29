@@ -1,0 +1,44 @@
+* Project
+
+** Milestone 1
+
+- create a new schedule
+- add events to schedule
+- edit event
+- remove event
+- persist schedule
+- output csv of schedule to upload to google sheets
+- events
+  - series
+    - event page
+    - results page
+    - race
+      - start date
+      - dock time
+      - start time
+      - end date
+      - time limit
+
+*** decisions
+
+- programming language
+  Go or Rust
+  - go
+- persistent store
+  postgresql
+- bazel for building
+- install dependencies or use containers
+  - containers
+  - rancher desktop
+    
+*** todo
+
+- [X] set up bazel for golang
+  set up bazel files and configured with gazell
+  
+- [ ] create cli
+- [ ] create data model
+- [ ] command to set up database
+- [ ] command to add schedule
+- [ ] command to add event to schedule
+- [ ] command to output schedule

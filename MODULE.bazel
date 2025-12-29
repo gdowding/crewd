@@ -1,0 +1,23 @@
+module(name = "crewd")
+
+bazel_dep(name = "rules_go", version = "0.59.0")
+bazel_dep(name = "gazelle", version = "0.47.0")
+
+go_sdk = use_extension("@rules_go//go:extensions.bzl", "go_sdk")
+# go_sdk.download(version = "1.23.4")
+
+# static analyzer
+# go_sdk.nogo(nogo = "//:my_nogo")
+
+# running go from repo
+# bazel run @rules_go//go -- mod tidy -v
+
+go_deps = use_extension("@gazelle//:extensions.bzl", "go_deps")
+go_deps.from_file(go_mod = "//:go.mod")
+
+# All *direct* Go dependencies of the module have to be listed explicitly.
+use_repo(
+    go_deps,
+    "io_gorm_driver_sqlite",
+    "io_gorm_gorm",
+)
