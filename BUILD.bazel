@@ -1,20 +1,36 @@
 load("@gazelle//:def.bzl", "gazelle")
 load("@rules_go//go:def.bzl", "go_binary", "go_library", "go_test")
 
-
 # gazelle:prefix github.com/gdowding/crewd
+
+load("@bazel_env.bzl", "bazel_env")
+load("@gazelle//:go_tools.bzl", "GO_TOOLS")
 
 gazelle(name = "gazelle")
 
 go_library(
-    name = "lib",
-    srcs = ["crewd.go"],
-    importpath = "",
+    name = "crewd_lib",
+    srcs = ["main.go"],
+    importpath = "github.com/gdowding/crewd",
     visibility = ["//visibility:private"],
+    deps = ["//cmd"],
+)
+
+bazel_env(
+    name = "env",
+    tools = {
+        "go": "@rules_go//go",
+    } | GO_TOOLS,
+)
+
+go_binary(
+    name = "crewd",
+    embed = [":crewd_lib"],
+    visibility = ["//visibility:public"],
 )
 
 go_test(
-    name = "lib_test",
+    name = "crewd_test",
     srcs = ["crewd_test.go"],
-    embed = [":lib"],
+    embed = [":crewd_lib"],
 )
