@@ -26,19 +26,30 @@
   - go
 - persistent store
   postgresql
+- data modeling
+
 - bazel for building
 - install dependencies or use containers
   - containers
   - rancher desktop
-    
+
 *** todo
 
 - [X] set up bazel for golang
   set up bazel files and configured with gazell
-  
 - [ ] create cli
+  - [ ]
 - [ ] create data model
 - [ ] command to set up database
 - [ ] command to add schedule
 - [ ] command to add event to schedule
 - [ ] command to output schedule
+
+
+** CLI
+
+*** add schedule
+
+#+begin_example
+crwd new schedule NAME
+#+end_example
