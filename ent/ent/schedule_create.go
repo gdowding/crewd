@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -16,6 +17,12 @@ type ScheduleCreate struct {
 	config
 	mutation *ScheduleMutation
 	hooks    []Hook
+}
+
+// SetName sets the "name" field.
+func (_c *ScheduleCreate) SetName(v string) *ScheduleCreate {
+	_c.mutation.SetName(v)
+	return _c
 }
 
 // Mutation returns the ScheduleMutation object of the builder.
@@ -52,6 +59,9 @@ func (_c *ScheduleCreate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (_c *ScheduleCreate) check() error {
+	if _, ok := _c.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "Schedule.name"`)}
+	}
 	return nil
 }
 
@@ -78,6 +88,10 @@ func (_c *ScheduleCreate) createSpec() (*Schedule, *sqlgraph.CreateSpec) {
 		_node = &Schedule{config: _c.config}
 		_spec = sqlgraph.NewCreateSpec(schedule.Table, sqlgraph.NewFieldSpec(schedule.FieldID, field.TypeInt))
 	)
+	if value, ok := _c.mutation.Name(); ok {
+		_spec.SetField(schedule.FieldName, field.TypeString, value)
+		_node.Name = value
+	}
 	return _node, _spec
 }
 

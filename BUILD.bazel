@@ -23,17 +23,10 @@ go_library(
     importpath = "github.com/gdowding/crewd",
     visibility = ["//visibility:private"],
     deps = [
-        "//cmd",
         "//ent/ent",
+        "//ent/ent/schedule",
         "@com_github_mattn_go_sqlite3//:go-sqlite3",
     ],
-)
-
-bazel_env(
-    name = "env",
-    tools = {
-        "go": "@rules_go//go",
-    } | GO_TOOLS,
 )
 
 go_binary(
@@ -46,6 +39,13 @@ go_test(
     name = "crewd_test",
     srcs = ["crewd_test.go"],
     embed = [":crewd_lib"],
+)
+
+bazel_env(
+    name = "env",
+    tools = {
+        "go": "@rules_go//go",
+    } | GO_TOOLS,
 )
 
 # generate new ent src files. Need to do when anything in ent/schema changes

@@ -1,6 +1,9 @@
 package schema
 
-import "entgo.io/ent"
+import (
+	"entgo.io/ent"
+	"entgo.io/ent/schema/field"
+)
 
 // Schedule holds the schema definition for the Schedule entity.
 type Schedule struct {
@@ -9,7 +12,9 @@ type Schedule struct {
 
 // Fields of the Schedule.
 func (Schedule) Fields() []ent.Field {
-	return nil
+	return []ent.Field{
+		field.String("name"),
+	}
 }
 
 // Edges of the Schedule.

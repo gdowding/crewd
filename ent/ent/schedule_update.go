@@ -27,6 +27,20 @@ func (_u *ScheduleUpdate) Where(ps ...predicate.Schedule) *ScheduleUpdate {
 	return _u
 }
 
+// SetName sets the "name" field.
+func (_u *ScheduleUpdate) SetName(v string) *ScheduleUpdate {
+	_u.mutation.SetName(v)
+	return _u
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (_u *ScheduleUpdate) SetNillableName(v *string) *ScheduleUpdate {
+	if v != nil {
+		_u.SetName(*v)
+	}
+	return _u
+}
+
 // Mutation returns the ScheduleMutation object of the builder.
 func (_u *ScheduleUpdate) Mutation() *ScheduleMutation {
 	return _u.mutation
@@ -68,6 +82,9 @@ func (_u *ScheduleUpdate) sqlSave(ctx context.Context) (_node int, err error) {
 			}
 		}
 	}
+	if value, ok := _u.mutation.Name(); ok {
+		_spec.SetField(schedule.FieldName, field.TypeString, value)
+	}
 	if _node, err = sqlgraph.UpdateNodes(ctx, _u.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{schedule.Label}
@@ -86,6 +103,20 @@ type ScheduleUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *ScheduleMutation
+}
+
+// SetName sets the "name" field.
+func (_u *ScheduleUpdateOne) SetName(v string) *ScheduleUpdateOne {
+	_u.mutation.SetName(v)
+	return _u
+}
+
+// SetNillableName sets the "name" field if the given value is not nil.
+func (_u *ScheduleUpdateOne) SetNillableName(v *string) *ScheduleUpdateOne {
+	if v != nil {
+		_u.SetName(*v)
+	}
+	return _u
 }
 
 // Mutation returns the ScheduleMutation object of the builder.
@@ -158,6 +189,9 @@ func (_u *ScheduleUpdateOne) sqlSave(ctx context.Context) (_node *Schedule, err 
 				ps[i](selector)
 			}
 		}
+	}
+	if value, ok := _u.mutation.Name(); ok {
+		_spec.SetField(schedule.FieldName, field.TypeString, value)
 	}
 	_node = &Schedule{config: _u.config}
 	_spec.Assign = _node.assignValues
