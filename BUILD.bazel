@@ -8,12 +8,25 @@ load("@gazelle//:go_tools.bzl", "GO_TOOLS")
 
 gazelle(name = "gazelle")
 
+filegroup(
+    name = "go_mod",
+    srcs = [
+        "go.mod",
+        "go.sum",
+    ],
+    visibility = ["//:__subpackages__"],
+)
+
 go_library(
     name = "crewd_lib",
     srcs = ["main.go"],
     importpath = "github.com/gdowding/crewd",
     visibility = ["//visibility:private"],
-    deps = ["//cmd"],
+    deps = [
+        "//cmd",
+        "//ent/ent",
+        "@com_github_mattn_go_sqlite3//:go-sqlite3",
+    ],
 )
 
 bazel_env(
@@ -34,3 +47,7 @@ go_test(
     srcs = ["crewd_test.go"],
     embed = [":crewd_lib"],
 )
+
+# generate new ent src files. Need to do when anything in ent/schema changes
+# need to figure out how to do this properly
+# ent generate --target ent ./ent_schema/schema

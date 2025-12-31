@@ -38,18 +38,37 @@
 - [X] set up bazel for golang
   set up bazel files and configured with gazell
 - [ ] create cli
-  - [ ]
+  - [ ] create new schedule
 - [ ] create data model
 - [ ] command to set up database
 - [ ] command to add schedule
+  - [ ] persist schedule
 - [ ] command to add event to schedule
 - [ ] command to output schedule
 
 
-** CLI
+** schedule
 
-*** add schedule
+*** CLI
 
 #+begin_example
-crwd new schedule NAME
+crewd schedule new NAME
 #+end_example
+
+*** Schedule
+
+#+name: schedule-model
+#+begin_src d2
+schedule {
+  name
+  events
+}
+#+end_src
+
+* issues
+
+** ent
+
+*** running go generate
+
+- ~bazel run //:gazelle~ was able to create build files to run generate
