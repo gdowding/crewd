@@ -39,7 +39,11 @@
   set up bazel files and configured with gazell
 - [ ] create cli
   - [ ] create new schedule
-- [ ] create data model
+- [-] create data model
+  - [X] schedule
+  - [ ] events
+- connect model and cli
+  - [ ] set up client and make it available to cli
 - [ ] command to set up database
 - [ ] command to add schedule
   - [ ] persist schedule
@@ -72,3 +76,7 @@ schedule {
 *** running go generate
 
 - ~bazel run //:gazelle~ was able to create build files to run generate
+
+- not happy with ent need to look into a different persistence / updating / quering package
+  - maybe gqlgen https://gqlgen.com, https://github.com/99designs/gqlgen
+  - finish current integration of persistence and command then decide

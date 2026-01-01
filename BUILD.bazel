@@ -22,11 +22,7 @@ go_library(
     srcs = ["main.go"],
     importpath = "github.com/gdowding/crewd",
     visibility = ["//visibility:private"],
-    deps = [
-        "//ent/ent",
-        "//ent/ent/schedule",
-        "@com_github_mattn_go_sqlite3//:go-sqlite3",
-    ],
+    deps = ["//cmd"],
 )
 
 go_binary(
