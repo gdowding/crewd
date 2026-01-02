@@ -6,7 +6,6 @@ go_library(
     importpath = "github.com/gdowding/crewd/cmd",
     visibility = ["//visibility:public"],
     deps = [
-        "//internal/cli",
         "//internal/cli/schedule",
         "@com_github_spf13_cobra//:cobra",
     ],

@@ -5,8 +5,4 @@ go_library(
     srcs = ["config.go"],
     importpath = "github.com/gdowding/crewd/internal/cli",
     visibility = ["//:__subpackages__"],
-    deps = [
-        "//ent/ent",
-        "@com_github_mattn_go_sqlite3//:go-sqlite3",
-    ],
 )

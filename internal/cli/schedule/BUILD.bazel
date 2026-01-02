@@ -5,10 +5,5 @@ go_library(
     srcs = ["schedule.go"],
     importpath = "github.com/gdowding/crewd/internal/cli/schedule",
     visibility = ["//visibility:public"],
-    deps = [
-        "//ent/ent",
-        "//ent/ent/schedule",
-        "//internal/cli",
-        "@com_github_spf13_cobra//:cobra",
-    ],
+    deps = ["@com_github_spf13_cobra//:cobra"],
 )

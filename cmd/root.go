@@ -6,11 +6,8 @@ package cmd
 
 import (
 	"os"
-	//"log"
-	"fmt"
 
 	"github.com/spf13/cobra"
-	"github.com/gdowding/crewd/internal/cli"
 	"github.com/gdowding/crewd/internal/cli/schedule"
 )
 
@@ -60,14 +57,9 @@ func init() {
 }
 
 func persistentPreRunE(cmd *cobra.Command, args []string) error {
-	err := cli.CreateClient()
-	if err != nil {
-		return fmt.Errorf("error creating client: %w", err)
-	}
 	return nil
 
 }
 
 func persistentPostRun(cmd *cobra.Command, args []string) {
-	cli.CloseClient()
 }
