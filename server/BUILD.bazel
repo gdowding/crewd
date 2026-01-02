@@ -1,0 +1,23 @@
+load("@rules_go//go:def.bzl", "go_binary", "go_library")
+
+go_library(
+    name = "server_lib",
+    srcs = ["server.go"],
+    importpath = "github.com/gdowding/crewd/server",
+    visibility = ["//visibility:private"],
+    deps = [
+        "//graph",
+        "@com_github_99designs_gqlgen//graphql/handler",
+        "@com_github_99designs_gqlgen//graphql/handler/extension",
+        "@com_github_99designs_gqlgen//graphql/handler/lru",
+        "@com_github_99designs_gqlgen//graphql/handler/transport",
+        "@com_github_99designs_gqlgen//graphql/playground",
+        "@com_github_vektah_gqlparser_v2//ast",
+    ],
+)
+
+go_binary(
+    name = "server",
+    embed = [":server_lib"],
+    visibility = ["//visibility:public"],
+)

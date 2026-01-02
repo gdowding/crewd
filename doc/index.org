@@ -40,6 +40,7 @@
 - [ ] create cli
   - [ ] create new schedule
 - [-] create data model
+  - [ ] try gqlgen
   - [X] schedule
   - [ ] events
 - connect model and cli

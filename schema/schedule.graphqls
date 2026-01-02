@@ -1,0 +1,16 @@
+type Schedule {
+  id: ID!
+  name: String!
+}
+
+type Query {
+  schedules: [Schedule!]!
+}
+
+input NewSchedule {
+  name: String!
+}
+
+type Mutation {
+  createSchedule(input: NewSchedule): Schedule!
+}

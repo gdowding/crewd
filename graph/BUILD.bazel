@@ -1,0 +1,21 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "graph",
+    srcs = [
+        "prelude.generated.go",
+        "resolver.go",
+        "root_.generated.go",
+        "schedule.generated.go",
+        "schedule.resolvers.go",
+    ],
+    importpath = "github.com/gdowding/crewd/graph",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//graph/model",
+        "@com_github_99designs_gqlgen//graphql",
+        "@com_github_99designs_gqlgen//graphql/introspection",
+        "@com_github_vektah_gqlparser_v2//:gqlparser",
+        "@com_github_vektah_gqlparser_v2//ast",
+    ],
+)
