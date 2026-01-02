@@ -4,6 +4,7 @@ go 1.25.0
 
 require (
 	ariga.io/atlas v0.32.1-0.20250325101103-175b25e1c1b9 // indirect
+	entgo.io/ent v0.14.5 // indirect
 	github.com/BurntSushi/toml v1.5.0 // indirect
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/agnivade/levenshtein v1.2.1 // indirect
@@ -26,6 +27,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/magiconair/properties v1.8.5 // indirect
 	github.com/mattn/go-runewidth v0.0.9 // indirect
+	github.com/mattn/go-sqlite3 v1.14.32 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/modelcontextprotocol/go-sdk v0.8.0 // indirect
@@ -60,9 +62,7 @@ require (
 )
 
 require (
-	entgo.io/ent v0.14.5
 	github.com/99designs/gqlgen v0.17.85
-	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/spf13/cobra v1.10.2
 	github.com/vektah/gqlparser/v2 v2.5.31
 )

@@ -11,4 +11,6 @@ import (
 
 type Resolver struct{
 	schedules []*model.Schedule
+	series []*model.Series
+	races []*model.Race
 }

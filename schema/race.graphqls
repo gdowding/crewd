@@ -1,0 +1,11 @@
+type Race {
+  id: ID!
+  name: String!
+  series: Series!
+}
+
+
+input NewRace {
+  name: String!
+  seriesId: String!
+}

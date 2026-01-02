@@ -1,0 +1,11 @@
+type Query {
+  schedules: [Schedule!]!
+  series: [Series]!
+  races: [Race]!
+}
+
+type Mutation {
+  createSchedule(input: NewSchedule): Schedule!
+  createSeries(input: NewSeries): Series!
+  createRace(input: NewRace): Race!
+}

@@ -25,9 +25,45 @@ func (r *mutationResolver) CreateSchedule(ctx context.Context, input *model.NewS
 	return schedule, nil
 }
 
+// CreateSeries is the resolver for the createSeries field.
+func (r *mutationResolver) CreateSeries(ctx context.Context, input *model.NewSeries) (*model.Series, error) {
+	randNumber, _ := rand.Int(rand.Reader, big.NewInt(100))
+	series := &model.Series{
+		ID:   fmt.Sprintf("T%d", randNumber),
+		Name: input.Name,
+	}
+	r.series = append(r.series, series)
+	return series, nil
+}
+
+// CreateRace is the resolver for the createRace field.
+func (r *mutationResolver) CreateRace(ctx context.Context, input *model.NewRace) (*model.Race, error) {
+	randNumber, _ := rand.Int(rand.Reader, big.NewInt(100))
+	race := &model.Race{
+		ID:   fmt.Sprintf("T%d", randNumber),
+		Name: input.Name,
+		Series: &model.Series{
+			ID:   input.SeriesID,
+			Name: "series " + input.SeriesID,
+		},
+	}
+	r.races = append(r.races, race)
+	return race, nil
+}
+
 // Schedules is the resolver for the schedules field.
 func (r *queryResolver) Schedules(ctx context.Context) ([]*model.Schedule, error) {
 	return r.schedules, nil
+}
+
+// Series is the resolver for the series field.
+func (r *queryResolver) Series(ctx context.Context) ([]*model.Series, error) {
+	panic(fmt.Errorf("not implemented: Series - series"))
+}
+
+// Races is the resolver for the races field.
+func (r *queryResolver) Races(ctx context.Context) ([]*model.Race, error) {
+	panic(fmt.Errorf("not implemented: Races - races"))
 }
 
 // Mutation returns MutationResolver implementation.

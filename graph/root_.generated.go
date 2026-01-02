@@ -42,16 +42,33 @@ type DirectiveRoot struct {
 
 type ComplexityRoot struct {
 	Mutation struct {
+		CreateRace     func(childComplexity int, input *model.NewRace) int
 		CreateSchedule func(childComplexity int, input *model.NewSchedule) int
+		CreateSeries   func(childComplexity int, input *model.NewSeries) int
 	}
 
 	Query struct {
+		Races     func(childComplexity int) int
 		Schedules func(childComplexity int) int
+		Series    func(childComplexity int) int
+	}
+
+	Race struct {
+		ID     func(childComplexity int) int
+		Name   func(childComplexity int) int
+		Series func(childComplexity int) int
 	}
 
 	Schedule struct {
 		ID   func(childComplexity int) int
 		Name func(childComplexity int) int
+	}
+
+	Series struct {
+		ID       func(childComplexity int) int
+		Name     func(childComplexity int) int
+		Races    func(childComplexity int) int
+		Schedule func(childComplexity int) int
 	}
 }
 
@@ -74,6 +91,18 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 	_ = ec
 	switch typeName + "." + field {
 
+	case "Mutation.createRace":
+		if e.complexity.Mutation.CreateRace == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createRace_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateRace(childComplexity, args["input"].(*model.NewRace)), true
+
 	case "Mutation.createSchedule":
 		if e.complexity.Mutation.CreateSchedule == nil {
 			break
@@ -86,12 +115,59 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Mutation.CreateSchedule(childComplexity, args["input"].(*model.NewSchedule)), true
 
+	case "Mutation.createSeries":
+		if e.complexity.Mutation.CreateSeries == nil {
+			break
+		}
+
+		args, err := ec.field_Mutation_createSeries_args(ctx, rawArgs)
+		if err != nil {
+			return 0, false
+		}
+
+		return e.complexity.Mutation.CreateSeries(childComplexity, args["input"].(*model.NewSeries)), true
+
+	case "Query.races":
+		if e.complexity.Query.Races == nil {
+			break
+		}
+
+		return e.complexity.Query.Races(childComplexity), true
+
 	case "Query.schedules":
 		if e.complexity.Query.Schedules == nil {
 			break
 		}
 
 		return e.complexity.Query.Schedules(childComplexity), true
+
+	case "Query.series":
+		if e.complexity.Query.Series == nil {
+			break
+		}
+
+		return e.complexity.Query.Series(childComplexity), true
+
+	case "Race.id":
+		if e.complexity.Race.ID == nil {
+			break
+		}
+
+		return e.complexity.Race.ID(childComplexity), true
+
+	case "Race.name":
+		if e.complexity.Race.Name == nil {
+			break
+		}
+
+		return e.complexity.Race.Name(childComplexity), true
+
+	case "Race.series":
+		if e.complexity.Race.Series == nil {
+			break
+		}
+
+		return e.complexity.Race.Series(childComplexity), true
 
 	case "Schedule.id":
 		if e.complexity.Schedule.ID == nil {
@@ -107,6 +183,34 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 
 		return e.complexity.Schedule.Name(childComplexity), true
 
+	case "Series.id":
+		if e.complexity.Series.ID == nil {
+			break
+		}
+
+		return e.complexity.Series.ID(childComplexity), true
+
+	case "Series.name":
+		if e.complexity.Series.Name == nil {
+			break
+		}
+
+		return e.complexity.Series.Name(childComplexity), true
+
+	case "Series.races":
+		if e.complexity.Series.Races == nil {
+			break
+		}
+
+		return e.complexity.Series.Races(childComplexity), true
+
+	case "Series.schedule":
+		if e.complexity.Series.Schedule == nil {
+			break
+		}
+
+		return e.complexity.Series.Schedule(childComplexity), true
+
 	}
 	return 0, false
 }
@@ -115,7 +219,9 @@ func (e *executableSchema) Exec(ctx context.Context) graphql.ResponseHandler {
 	opCtx := graphql.GetOperationContext(ctx)
 	ec := executionContext{opCtx, e, 0, 0, make(chan graphql.DeferredResult)}
 	inputUnmarshalMap := graphql.BuildUnmarshalerMap(
+		ec.unmarshalInputNewRace,
 		ec.unmarshalInputNewSchedule,
+		ec.unmarshalInputNewSeries,
 	)
 	first := true
 
@@ -213,21 +319,52 @@ func (ec *executionContext) introspectType(name string) (*introspection.Type, er
 }
 
 var sources = []*ast.Source{
+	{Name: "../schema/race.graphqls", Input: `type Race {
+  id: ID!
+  name: String!
+  series: Series!
+}
+
+
+input NewRace {
+  name: String!
+  seriesId: String!
+}
+
+`, BuiltIn: false},
+	{Name: "../schema/root.graphqls", Input: `type Query {
+  schedules: [Schedule!]!
+  series: [Series]!
+  races: [Race]!
+}
+
+type Mutation {
+  createSchedule(input: NewSchedule): Schedule!
+  createSeries(input: NewSeries): Series!
+  createRace(input: NewRace): Race!
+}
+`, BuiltIn: false},
 	{Name: "../schema/schedule.graphqls", Input: `type Schedule {
   id: ID!
   name: String!
-}
-
-type Query {
-  schedules: [Schedule!]!
 }
 
 input NewSchedule {
   name: String!
 }
 
-type Mutation {
-  createSchedule(input: NewSchedule): Schedule!
+`, BuiltIn: false},
+	{Name: "../schema/series.graphqls", Input: `type Series {
+  id: ID!
+  schedule: Schedule!
+  name: String!
+  races: [Race]
+}
+
+
+input NewSeries {
+  name: String!
+  scheduleID: String!
 }
 
 `, BuiltIn: false},

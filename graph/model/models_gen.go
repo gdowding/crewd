@@ -5,14 +5,37 @@ package model
 type Mutation struct {
 }
 
+type NewRace struct {
+	Name     string `json:"name"`
+	SeriesID string `json:"seriesId"`
+}
+
 type NewSchedule struct {
 	Name string `json:"name"`
+}
+
+type NewSeries struct {
+	Name       string `json:"name"`
+	ScheduleID string `json:"scheduleID"`
 }
 
 type Query struct {
 }
 
+type Race struct {
+	ID     string  `json:"id"`
+	Name   string  `json:"name"`
+	Series *Series `json:"series"`
+}
+
 type Schedule struct {
 	ID   string `json:"id"`
 	Name string `json:"name"`
+}
+
+type Series struct {
+	ID       string    `json:"id"`
+	Schedule *Schedule `json:"schedule"`
+	Name     string    `json:"name"`
+	Races    []*Race   `json:"races,omitempty"`
 }

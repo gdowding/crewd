@@ -38,18 +38,27 @@
 - [X] set up bazel for golang
   set up bazel files and configured with gazell
 - [ ] create cli
-  - [ ] create new schedule
-- [-] create data model
-  - [ ] try gqlgen
+  - [ ] connect model and cli
+    This is now client server so need to make cli to connect to server and server needs to be running
+- [ ] persistence
+  - [ ] persistence backend for gqlgen
+- [-] data model
+  - [X] try gqlgen
   - [X] schedule
-  - [ ] events
-- connect model and cli
-  - [ ] set up client and make it available to cli
-- [ ] command to set up database
-- [ ] command to add schedule
-  - [ ] persist schedule
-- [ ] command to add event to schedule
-- [ ] command to output schedule
+    - create
+    - query
+  - [ ] top down traversal from schedule to races
+  - [ ] event interface (maybe)
+  - [ ] series with one or more races
+    - [ ] race
+  - [ ] create
+  - [ ] add event to schedule
+  - [ ] add crew to event by date
+  - [ ] generate calendar in isc format
+- [ ] commands
+  - [ ] command to add schedule
+  - [ ] command to add event to schedule
+  - [ ] command to output schedule along with all events
 
 
 ** schedule

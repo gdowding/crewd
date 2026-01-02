@@ -1,0 +1,12 @@
+type Series {
+  id: ID!
+  schedule: Schedule!
+  name: String!
+  races: [Race]
+}
+
+
+input NewSeries {
+  name: String!
+  scheduleID: String!
+}
