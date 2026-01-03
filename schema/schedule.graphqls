@@ -1,7 +1,7 @@
 type Schedule {
   id: ID!
   name: String!
-  series: [Series]!
+  series: [Series!]!
 }
 
 input NewSchedule {

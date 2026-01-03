@@ -12,7 +12,8 @@ import (
 )
 
 type Resolver struct{
-	schedules []*model.Schedule
-	series []*model.Series
-	races []*model.Race
+	// TODO change to map of references
+	Schedules_ map[string]model.Schedule
+	Series_ map[string]model.Series
+	Races_ map[string]model.Race
 }

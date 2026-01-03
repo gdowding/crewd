@@ -35,7 +35,6 @@ type Config struct {
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
-	Schedule() ScheduleResolver
 	Series() SeriesResolver
 }
 
@@ -356,7 +355,7 @@ type Mutation {
 	{Name: "../schema/schedule.graphqls", Input: `type Schedule {
   id: ID!
   name: String!
-  series: [Series]!
+  series: [Series!]!
 }
 
 input NewSchedule {

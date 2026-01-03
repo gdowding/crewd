@@ -11,7 +11,9 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
 	"github.com/gdowding/crewd/graph"
+	"github.com/gdowding/crewd/graph/model"
 	"github.com/vektah/gqlparser/v2/ast"
+
 )
 
 const defaultPort = "8080"
@@ -21,8 +23,13 @@ func main() {
 	if port == "" {
 		port = defaultPort
 	}
+	resolver := &graph.Resolver{
+		Schedules_: make(map[string]model.Schedule),
+		Series_: make(map[string]model.Series),
+		Races_: make(map[string]model.Race),
+	}
 
-	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: &graph.Resolver{}}))
+	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
 
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})

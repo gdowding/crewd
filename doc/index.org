@@ -48,6 +48,8 @@
     - create
     - query
   - [ ] top down traversal from schedule to races
+    - [ ] initialize series field when creating schedule
+    - [ ] initialize races field when creating series
   - [ ] event interface (maybe)
   - [ ] series with one or more races
     - [ ] race

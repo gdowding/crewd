@@ -16,9 +16,9 @@ import (
 func (r *seriesResolver) Schedule(ctx context.Context, obj *model.Series) (*model.Schedule, error) {
 	var schedule *model.Schedule
 
-	for _, s := range r.schedules {
+	for _, s := range r.Schedules_ {
 		if obj.ScheduleID == s.ID {
-			schedule = s
+			schedule = &s
 			break
 		}
 	}
