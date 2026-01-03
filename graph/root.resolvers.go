@@ -27,11 +27,25 @@ func (r *mutationResolver) CreateSchedule(ctx context.Context, input *model.NewS
 
 // CreateSeries is the resolver for the createSeries field.
 func (r *mutationResolver) CreateSeries(ctx context.Context, input *model.NewSeries) (*model.Series, error) {
+	var schedule *model.Schedule
+
 	randNumber, _ := rand.Int(rand.Reader, big.NewInt(100))
 	series := &model.Series{
-		ID:   fmt.Sprintf("T%d", randNumber),
-		Name: input.Name,
+		ID:         fmt.Sprintf("T%d", randNumber),
+		ScheduleID: input.ScheduleID,
+		Name:       input.Name,
 	}
+	// find schedule and update id with this series id
+	for _, sch := range r.schedules {
+		if sch.ID == input.ScheduleID {
+			schedule = sch
+			break
+		}
+	}
+	if schedule == nil {
+		return nil, fmt.Errorf("couldn't find schedule with ID: %s", input.ScheduleID)
+	}
+	schedule.SeriesIDs = append(schedule.SeriesIDs, series.ID)
 	r.series = append(r.series, series)
 	return series, nil
 }
@@ -58,7 +72,7 @@ func (r *queryResolver) Schedules(ctx context.Context) ([]*model.Schedule, error
 
 // Series is the resolver for the series field.
 func (r *queryResolver) Series(ctx context.Context) ([]*model.Series, error) {
-	panic(fmt.Errorf("not implemented: Series - series"))
+	return r.series, nil
 }
 
 // Races is the resolver for the races field.

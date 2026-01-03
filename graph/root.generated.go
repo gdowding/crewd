@@ -111,6 +111,8 @@ func (ec *executionContext) fieldContext_Mutation_createSchedule(ctx context.Con
 				return ec.fieldContext_Schedule_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Schedule_name(ctx, field)
+			case "series":
+				return ec.fieldContext_Schedule_series(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Schedule", field.Name)
 		},
@@ -257,6 +259,8 @@ func (ec *executionContext) fieldContext_Query_schedules(_ context.Context, fiel
 				return ec.fieldContext_Schedule_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Schedule_name(ctx, field)
+			case "series":
+				return ec.fieldContext_Schedule_series(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Schedule", field.Name)
 		},

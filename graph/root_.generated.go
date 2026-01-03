@@ -35,6 +35,8 @@ type Config struct {
 type ResolverRoot interface {
 	Mutation() MutationResolver
 	Query() QueryResolver
+	Schedule() ScheduleResolver
+	Series() SeriesResolver
 }
 
 type DirectiveRoot struct {
@@ -60,8 +62,9 @@ type ComplexityRoot struct {
 	}
 
 	Schedule struct {
-		ID   func(childComplexity int) int
-		Name func(childComplexity int) int
+		ID     func(childComplexity int) int
+		Name   func(childComplexity int) int
+		Series func(childComplexity int) int
 	}
 
 	Series struct {
@@ -182,6 +185,13 @@ func (e *executableSchema) Complexity(ctx context.Context, typeName, field strin
 		}
 
 		return e.complexity.Schedule.Name(childComplexity), true
+
+	case "Schedule.series":
+		if e.complexity.Schedule.Series == nil {
+			break
+		}
+
+		return e.complexity.Schedule.Series(childComplexity), true
 
 	case "Series.id":
 		if e.complexity.Series.ID == nil {
@@ -330,7 +340,6 @@ input NewRace {
   name: String!
   seriesId: String!
 }
-
 `, BuiltIn: false},
 	{Name: "../schema/root.graphqls", Input: `type Query {
   schedules: [Schedule!]!
@@ -347,12 +356,12 @@ type Mutation {
 	{Name: "../schema/schedule.graphqls", Input: `type Schedule {
   id: ID!
   name: String!
+  series: [Series]!
 }
 
 input NewSchedule {
   name: String!
 }
-
 `, BuiltIn: false},
 	{Name: "../schema/series.graphqls", Input: `type Series {
   id: ID!
@@ -366,7 +375,6 @@ input NewSeries {
   name: String!
   scheduleID: String!
 }
-
 `, BuiltIn: false},
 }
 var parsedSchema = gqlparser.MustLoadSchema(sources...)

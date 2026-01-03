@@ -12,6 +12,7 @@ go_library(
         "schedule.generated.go",
         "schedule.resolvers.go",
         "series.generated.go",
+        "series.resolvers.go",
     ],
     importpath = "github.com/gdowding/crewd/graph",
     visibility = ["//visibility:public"],

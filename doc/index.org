@@ -61,6 +61,32 @@
   - [ ] command to output schedule along with all events
 
 
+* data model
+
+** schedule
+
+- name
+- events
+
+** events - interface? - not sure I need this yet
+- name
+- type: series, race, delivery, maint, social
+
+** link
+- name
+- link
+
+** series
+- name
+- races[]
+- links[]
+
+** race
+- name
+- start date
+- start time
+
+
 ** schedule
 
 *** CLI

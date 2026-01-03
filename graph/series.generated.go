@@ -17,6 +17,10 @@ import (
 
 // region    ************************** generated!.gotpl **************************
 
+type SeriesResolver interface {
+	Schedule(ctx context.Context, obj *model.Series) (*model.Schedule, error)
+}
+
 // endregion ************************** generated!.gotpl **************************
 
 // region    ***************************** args.gotpl *****************************
@@ -65,7 +69,7 @@ func (ec *executionContext) _Series_schedule(ctx context.Context, field graphql.
 		field,
 		ec.fieldContext_Series_schedule,
 		func(ctx context.Context) (any, error) {
-			return obj.Schedule, nil
+			return ec.resolvers.Series().Schedule(ctx, obj)
 		},
 		nil,
 		ec.marshalNSchedule2ᚖgithubᚗcomᚋgdowdingᚋcrewdᚋgraphᚋmodelᚐSchedule,
@@ -78,14 +82,16 @@ func (ec *executionContext) fieldContext_Series_schedule(_ context.Context, fiel
 	fc = &graphql.FieldContext{
 		Object:     "Series",
 		Field:      field,
-		IsMethod:   false,
-		IsResolver: false,
+		IsMethod:   true,
+		IsResolver: true,
 		Child: func(ctx context.Context, field graphql.CollectedField) (*graphql.FieldContext, error) {
 			switch field.Name {
 			case "id":
 				return ec.fieldContext_Schedule_id(ctx, field)
 			case "name":
 				return ec.fieldContext_Schedule_name(ctx, field)
+			case "series":
+				return ec.fieldContext_Schedule_series(ctx, field)
 			}
 			return nil, fmt.Errorf("no field named %q was found under type Schedule", field.Name)
 		},
@@ -219,17 +225,48 @@ func (ec *executionContext) _Series(ctx context.Context, sel ast.SelectionSet, o
 		case "id":
 			out.Values[i] = ec._Series_id(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "schedule":
-			out.Values[i] = ec._Series_schedule(ctx, field, obj)
-			if out.Values[i] == graphql.Null {
-				out.Invalids++
+			field := field
+
+			innerFunc := func(ctx context.Context, fs *graphql.FieldSet) (res graphql.Marshaler) {
+				defer func() {
+					if r := recover(); r != nil {
+						ec.Error(ctx, ec.Recover(ctx, r))
+					}
+				}()
+				res = ec._Series_schedule(ctx, field, obj)
+				if res == graphql.Null {
+					atomic.AddUint32(&fs.Invalids, 1)
+				}
+				return res
 			}
+
+			if field.Deferrable != nil {
+				dfs, ok := deferred[field.Deferrable.Label]
+				di := 0
+				if ok {
+					dfs.AddField(field)
+					di = len(dfs.Values) - 1
+				} else {
+					dfs = graphql.NewFieldSet([]graphql.CollectedField{field})
+					deferred[field.Deferrable.Label] = dfs
+				}
+				dfs.Concurrently(di, func(ctx context.Context) graphql.Marshaler {
+					return innerFunc(ctx, dfs)
+				})
+
+				// don't run the out.Concurrently() call below
+				out.Values[i] = graphql.Null
+				continue
+			}
+
+			out.Concurrently(i, func(ctx context.Context) graphql.Marshaler { return innerFunc(ctx, out) })
 		case "name":
 			out.Values[i] = ec._Series_name(ctx, field, obj)
 			if out.Values[i] == graphql.Null {
-				out.Invalids++
+				atomic.AddUint32(&out.Invalids, 1)
 			}
 		case "races":
 			out.Values[i] = ec._Series_races(ctx, field, obj)

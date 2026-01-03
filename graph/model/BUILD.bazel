@@ -2,7 +2,11 @@ load("@rules_go//go:def.bzl", "go_library")
 
 go_library(
     name = "model",
-    srcs = ["models_gen.go"],
+    srcs = [
+        "models_gen.go",
+        "schedule.go",
+        "series.go",
+    ],
     importpath = "github.com/gdowding/crewd/graph/model",
     visibility = ["//visibility:public"],
 )
