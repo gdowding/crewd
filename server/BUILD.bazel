@@ -7,6 +7,7 @@ go_library(
     visibility = ["//visibility:private"],
     deps = [
         "//graph",
+        "//graph/database",
         "//graph/model",
         "@com_github_99designs_gqlgen//graphql/handler",
         "@com_github_99designs_gqlgen//graphql/handler/extension",

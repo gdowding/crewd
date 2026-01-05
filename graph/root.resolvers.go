@@ -7,64 +7,63 @@ package graph
 
 import (
 	"context"
-	"crypto/rand"
 	"fmt"
-	"math/big"
 
+	"github.com/gdowding/crewd/graph/database"
 	"github.com/gdowding/crewd/graph/model"
+	"github.com/google/uuid"
 )
 
 // CreateSchedule is the resolver for the createSchedule field.
 func (r *mutationResolver) CreateSchedule(ctx context.Context, input *model.NewSchedule) (*model.Schedule, error) {
-	randNumber, _ := rand.Int(rand.Reader, big.NewInt(100))
-	schedule := model.Schedule{
-		ID:     fmt.Sprintf("S%d", randNumber),
+	id := uuid.New().String()
+	schedule := &model.Schedule{
+		ID:     id,
 		Name:   input.Name,
 		Series: []*model.Series{},
 	}
-	r.Schedules_[schedule.ID] = schedule
-	return &schedule, nil
+	if err := database.DB.Create(schedule).Error; err != nil {
+		return nil, err
+	}
+	return schedule, nil
 }
 
 // CreateSeries is the resolver for the createSeries field.
 func (r *mutationResolver) CreateSeries(ctx context.Context, input *model.NewSeries) (*model.Series, error) {
-	schedule, ok := r.Schedules_[input.ScheduleID]
-	if !ok {
-		return nil, fmt.Errorf("schedule with ID %s not found, input.ScheduleID")
-	}
-	randNumber, _ := rand.Int(rand.Reader, big.NewInt(100))
+	id := uuid.New().String()
 	series := model.Series{
-		ID:         fmt.Sprintf("Ser%d", randNumber),
+		ID:         id,
 		ScheduleID: input.ScheduleID,
 		Name:       input.Name,
 	}
-	r.Series_[series.ID] = series
-	schedule.Series = append(schedule.Series, &series)
+	if err := database.DB.Create(series).Error; err != nil {
+		return nil, err
+	}
+	// schedule.Series = append(schedule.Series, &series)
 	// change dependencies to be references then remove this line.
-	r.Schedules_[input.ScheduleID] = schedule
+	// r.Schedules_[input.ScheduleID] = schedule
 	return &series, nil
 }
 
 // CreateRace is the resolver for the createRace field.
 func (r *mutationResolver) CreateRace(ctx context.Context, input *model.NewRace) (*model.Race, error) {
-	randNumber, _ := rand.Int(rand.Reader, big.NewInt(100))
+	id := uuid.New().String()
 	race := model.Race{
-		ID:   fmt.Sprintf("R%d", randNumber),
-		Name: input.Name,
-		Series: &model.Series{
-			ID:   input.SeriesID,
-			Name: "series " + input.SeriesID,
-		},
+		ID:       id,
+		Name:     input.Name,
+		SeriesID: input.SeriesID,
 	}
-	r.Races_[race.ID] = race
+	if err := database.DB.Create(race).Error; err != nil {
+		return nil, err
+	}
 	return &race, nil
 }
 
 // Schedules is the resolver for the schedules field.
 func (r *queryResolver) Schedules(ctx context.Context) ([]*model.Schedule, error) {
 	var schedules []*model.Schedule
-	for _, v := range r.Schedules_ {
-		schedules = append(schedules, &v)
+	if err := database.DB.Find(&schedules).Error; err != nil {
+		return nil, err
 	}
 	return schedules, nil
 }
@@ -72,8 +71,8 @@ func (r *queryResolver) Schedules(ctx context.Context) ([]*model.Schedule, error
 // Series is the resolver for the series field.
 func (r *queryResolver) Series(ctx context.Context) ([]*model.Series, error) {
 	var series []*model.Series
-	for _, v := range r.Series_ {
-		series = append(series, &v)
+	if err := database.DB.Find(&series).Error; err != nil {
+		return nil, err
 	}
 	return series, nil
 }

@@ -40,21 +40,24 @@
 - [ ] create cli
   - [ ] connect model and cli
     This is now client server so need to make cli to connect to server and server needs to be running
-- [ ] persistence
+- [-] persistence
+  following this example https://github.com/oshalygin/gqlgen-pg-todo-example/blob/master/main.go
+  - [X] install postgres
+    homebrew
+  - [ ] configure server.go to use postgres backend
   - [ ] persistence backend for gqlgen
 - [-] data model
   - [X] try gqlgen
   - [X] schedule
     - create
     - query
-  - [ ] top down traversal from schedule to races
-    - [ ] initialize series field when creating schedule
-    - [ ] initialize races field when creating series
+  - [-] top down traversal from schedule to races
+    - [X] schedule to series
+    - [ ] series to races
   - [ ] event interface (maybe)
   - [ ] series with one or more races
     - [ ] race
   - [ ] create
-  - [ ] add event to schedule
   - [ ] add crew to event by date
   - [ ] generate calendar in isc format
 - [ ] commands

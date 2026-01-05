@@ -17,11 +17,15 @@ go_deps.from_file(go_mod = "//:go.mod")
 use_repo(
     go_deps,
     "com_github_99designs_gqlgen",
-    "com_github_mattn_go_sqlite3",
+    "com_github_go_pg_pg_v9",
+    "com_github_google_uuid",
     "com_github_spf13_cobra",
     "com_github_spf13_cobra_cli",
     "com_github_vektah_gqlparser_v2",
+    "com_github_vikstrous_dataloadgen",
     "io_entgo_ent",
+    "io_gorm_driver_postgres",
+    "io_gorm_gorm",
     "org_golang_x_tools",
     "org_golang_x_tools_gopls",
 )

@@ -7,25 +7,19 @@ package graph
 
 import (
 	"context"
-	"fmt"
 
+	"github.com/gdowding/crewd/graph/database"
 	"github.com/gdowding/crewd/graph/model"
+	"gorm.io/gorm"
 )
 
 // Schedule is the resolver for the schedule field.
 func (r *seriesResolver) Schedule(ctx context.Context, obj *model.Series) (*model.Schedule, error) {
-	var schedule *model.Schedule
-
-	for _, s := range r.Schedules_ {
-		if obj.ScheduleID == s.ID {
-			schedule = &s
-			break
-		}
+	schedule, err := gorm.G[model.Schedule](database.DB).Where("id = ?", obj.ScheduleID).First(ctx)
+	if err != nil {
+		return nil, err
 	}
-	if schedule == nil {
-		return nil, fmt.Errorf("unable to find schedule with ID: %s", obj.ScheduleID)
-	}
-	return schedule, nil
+	return &schedule, nil
 }
 
 // Series returns SeriesResolver implementation.

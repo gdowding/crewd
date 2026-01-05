@@ -8,29 +8,29 @@ import (
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/handler/extension"
 	"github.com/99designs/gqlgen/graphql/handler/lru"
-	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/99designs/gqlgen/graphql/playground"
+	"github.com/99designs/gqlgen/graphql/handler/transport"
 	"github.com/gdowding/crewd/graph"
-	"github.com/gdowding/crewd/graph/model"
 	"github.com/vektah/gqlparser/v2/ast"
-
+	"github.com/gdowding/crewd/graph/model"
+	"github.com/gdowding/crewd/graph/database"
 )
 
 const defaultPort = "8080"
 
 func main() {
+	err := database.ConnectDB()
+	if err != nil {
+		log.Fatal("failed to connect to database: ", err)
+	}
+	database.DB.AutoMigrate(&model.Schedule{}, &model.Series{}, &model.Race{})
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = defaultPort
 	}
-	resolver := &graph.Resolver{
-		Schedules_: make(map[string]model.Schedule),
-		Series_: make(map[string]model.Series),
-		Races_: make(map[string]model.Race),
-	}
-
+	resolver := &graph.Resolver{}
 	srv := handler.New(graph.NewExecutableSchema(graph.Config{Resolvers: resolver}))
-
 	srv.AddTransport(transport.Options{})
 	srv.AddTransport(transport.GET{})
 	srv.AddTransport(transport.POST{})
@@ -47,4 +47,5 @@ func main() {
 
 	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
 	log.Fatal(http.ListenAndServe(":"+port, nil))
+
 }

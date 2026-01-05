@@ -21,9 +21,3 @@ type NewSeries struct {
 
 type Query struct {
 }
-
-type Race struct {
-	ID     string  `json:"id"`
-	Name   string  `json:"name"`
-	Series *Series `json:"series"`
-}
