@@ -1,8 +1,0 @@
-load("@rules_go//go:def.bzl", "go_library")
-
-go_library(
-    name = "cli",
-    srcs = ["config.go"],
-    importpath = "github.com/gdowding/crewd/internal/cli",
-    visibility = ["//:__subpackages__"],
-)
