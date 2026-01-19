@@ -1,0 +1,36 @@
+{
+  "sysroot": "/private/var/tmp/_bazel_gdowding/15fa6e1d9b4464385f1bfed5f0b81704/external/rules_rust++rust+rust_analyzer_1.84.0_tools",
+  "sysroot_src": "/private/var/tmp/_bazel_gdowding/15fa6e1d9b4464385f1bfed5f0b81704/external/rules_rust++rust+rust_analyzer_1.84.0_tools/lib/rustlib/src/library",
+  "crates": [
+    {
+      "display_name": "crewd",
+      "root_module": "/Users/gdowding/git/github/gdowding/crewd/src/main.rs",
+      "edition": "2021",
+      "deps": [],
+      "is_workspace_member": true,
+      "cfg": [
+        "test",
+        "debug_assertions"
+      ],
+      "target": "aarch64-apple-darwin",
+      "env": {
+        "CARGO_CFG_TARGET_ARCH": "aarch64",
+        "CARGO_CFG_TARGET_OS": "darwin",
+        "CARGO_CRATE_NAME": "crewd",
+        "CARGO_MANIFEST_DIR": "/private/var/tmp/_bazel_gdowding/15fa6e1d9b4464385f1bfed5f0b81704/execroot/_main",
+        "CARGO_PKG_AUTHORS": "",
+        "CARGO_PKG_DESCRIPTION": "",
+        "CARGO_PKG_HOMEPAGE": "",
+        "CARGO_PKG_NAME": "crewd",
+        "CARGO_PKG_VERSION": "0.0.0",
+        "CARGO_PKG_VERSION_MAJOR": "0",
+        "CARGO_PKG_VERSION_MINOR": "0",
+        "CARGO_PKG_VERSION_PATCH": "0",
+        "CARGO_PKG_VERSION_PRE": "",
+        "REPOSITORY_NAME": "",
+        "ZERO_AR_DATE": "1"
+      },
+      "is_proc_macro": false
+    }
+  ]
+}
