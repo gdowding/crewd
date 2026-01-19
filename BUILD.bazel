@@ -5,6 +5,12 @@ rust_binary(
     name = "crewd",
     srcs = ["src/main.rs"],
     visibility = ["//visibility:public"],
+    deps = [
+        "@crates//:anyhow",
+        "@crates//:chrono",
+        "@crates//:regex",
+        "@crates//:walkdir",
+    ],
 )
 
 bazel_env(

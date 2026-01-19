@@ -22,3 +22,6 @@ I need to be able to.
 - output csv for sheets
   - complete schedule
   - indivdual races
+
+** TODO read in filesystem and store in internal data structure
+- used gemini to generate program to read data into memory
