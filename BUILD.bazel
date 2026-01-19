@@ -1,2 +1,7 @@
-# BUILD.bazel contents cleared of Go rules.
-# Add Rust rules here (e.g., load("@rules_rust//rust:defs.bzl", "rust_binary"))
+load("@rules_rust//rust:defs.bzl", "rust_binary")
+
+rust_binary(
+    name = "crewd",
+    srcs = ["src/main.rs"],
+    visibility = ["//visibility:public"],
+)
