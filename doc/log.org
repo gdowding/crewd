@@ -1,0 +1,24 @@
+* <2026-01-17 Sat>
+** I need to make a shareable calendar for upcoming races
+*** TODO add dock time
+*** TODO add time limit
+*** TODO add rsvp
+* <2026-01-19 Mon>
+Change of direction
+
+Instead of finding libraries that meet my needs and adapting to them, I am thinking I will make more progress and enjoy this more if I am working direcly on the code. I realized that using a database, an ORM and a querying library is taking time away from working on the business logic. I can use tools like emacs org-mode for the management UI, the file system for storage, google sheets/calendar for user UI.
+
+I need to be able to.
+
+- read in from file system using structure to manage series and race relationships
+- parse the org format being used in management UI files
+- read in crew list from sheets
+- read in ics from calendar for invit responses
+- read in csv from sheets for sign ups
+- merge data from org and sheets
+  - figure out what data can come from calendar and sheets
+    - sign ups
+- output calendar ics
+- output csv for sheets
+  - complete schedule
+  - indivdual races

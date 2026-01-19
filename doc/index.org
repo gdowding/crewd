@@ -69,27 +69,40 @@
 * data model
 
 ** schedule
-
-- name
-- events
-
-** events - interface? - not sure I need this yet
-- name
-- type: series, race, delivery, maint, social
-
-** link
-- name
-- link
+:PROPERTIES:
+:NAME:     schedule name
+:END:
 
 ** series
-- name
-- races[]
-- links[]
-
-** race
-- name
-- start date
-- start time
+:PROPERTIES:
+:NAME:     series name
+:EVENT_PAGE: http
+:CLASS_BREAKS: http
+:RESULTS:  http
+:CLASS:    7
+:SPONSOR:  styc
+:BOAT:     irie
+:RATING_SYSTEM: orc | phrf
+:RATING:   82
+:REGISTRATION_DEADLINE: next month
+:REGISTRATION_COST: $100.00
+:END:
+Note: there are synonyms for class that some race organizers use.
+*** day
+:PROPERTIES:
+:DATE_START:     today
+:DATE_END: today 5:00pm
+:DOCK_TIME: 9:00am
+:FIRST_START: 10:00am
+:CLASS_START: 11:00am
+:CUT_OFF: 15:00
+:END:
+**** race
+:PROPERTIES:
+:RACE_NUMBER: 1
+:START: 10:00
+:FINISH:   12:35
+:END:
 
 
 ** schedule

@@ -1,0 +1,33 @@
+load("@rules_go//go:def.bzl", "go_library")
+
+go_library(
+    name = "loaders",
+    srcs = [
+        "loader.go",
+        "schedule.go",
+    ],
+    importpath = "github.com/gdowding/crewd/graph/loaders",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//graph",
+        "//graph/model",
+        "@com_github_go_pg_pg_v9//:pg",
+        "@com_github_vikstrous_dataloadgen//:dataloadgen",
+    ],
+)
+
+go_library(
+    name = "loader",
+    srcs = [
+        "loader.go",
+        "schedule.go",
+    ],
+    importpath = "github.com/gdowding/crewd/graph/loader",
+    visibility = ["//visibility:public"],
+    deps = [
+        "//graph",
+        "//graph/model",
+        "@com_github_go_pg_pg_v9//:pg",
+        "@com_github_vikstrous_dataloadgen//:dataloadgen",
+    ],
+)

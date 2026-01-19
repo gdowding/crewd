@@ -1,0 +1,34 @@
+* TODO figure out why org is prefixing summaries with 'S:' in ics :annoyance:
+
+** input
+#+begin_example
+    * Practice
+    ** Practices
+    *** Practice 1
+    SCHEDULED: <2026-02-07 Sat>
+    * Snowbird 2025-2026
+    :PROPERTIES:
+    :SERIES:   snowbird
+    :EVENT_PAGE: https://www.styc.org/Snowbird-Series
+    :SPONSOR:  Sloop Tavern Yacht Club
+    :END:
+#+end_example
+
+** output
+#+begin_example
+BEGIN:VEVENT
+DTSTAMP:20260112T064657Z
+UID:SC-DC88E6BB-11FA-45AB-BD8A-4E6BA1A39527
+DTSTART;VALUE=DATE:20260207
+DTEND;VALUE=DATE:20260208
+SUMMARY:S: Practice 1
+CATEGORIES:series
+END:VEVENT
+#+end_example
+
+
+** better output format for urls
+
+#+begin_src elisp
+
+#+end_src
