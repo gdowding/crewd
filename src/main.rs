@@ -50,15 +50,30 @@ struct PrintableRace {
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        anyhow::bail!("Usage: {} <root-directory>", args[0]);
+        anyhow::bail!("Usage: {} <root-directory> [--csv]", args[0]);
     }
-    let root = &args[1];
+
+    // Find the root argument (first argument that doesn't start with --)
+    // Or assume position 1 is root? The user command was `crewd data/irie-schedule`.
+    // If user types `crewd --csv data/irie-schedule`, root is index 2.
+    // I'll filter out flags.
+    let root = args.iter().skip(1).find(|arg| !arg.starts_with("--"))
+        .context("Missing root directory argument")?;
+
+    let csv_mode = args.iter().any(|arg| arg == "--csv");
+
     let schedule = load_schedule(root)?;
-    print_schedule(&schedule);
+    let rows = collect_schedule_rows(&schedule);
+
+    if csv_mode {
+        print_csv(rows);
+    } else {
+        print_table(rows);
+    }
     Ok(())
 }
 
-fn print_schedule(schedule: &Schedule) {
+fn collect_schedule_rows(schedule: &Schedule) -> Vec<PrintableRace> {
     let mut rows: Vec<PrintableRace> = Vec::new();
     let re_date = Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
     let re_day = Regex::new(r"^[A-Z][a-z]{2}$").unwrap();
@@ -132,7 +147,7 @@ fn print_schedule(schedule: &Schedule) {
                 });
             }
 
-            // Also check for series-level date if no races?
+            // Check for series-level date if no races?
             if series.races.is_empty() {
                  if let (Some(start_raw), Some(end_raw)) = (series.properties.get("DATE_START"), series.properties.get("DATE_END")) {
                      let clean_chars: &[char] = &['<', '>', '[', ']'];
@@ -162,7 +177,10 @@ fn print_schedule(schedule: &Schedule) {
     }
 
     rows.sort_by(|a, b| a.date_start.cmp(&b.date_start));
+    rows
+}
 
+fn print_table(rows: Vec<PrintableRace>) {
     println!(
         "{:<12} {:<12} {:<12} {:<20} {:<15} {:<30} {:<30} {:<30}",
         "Date Start", "Date End", "First Start", "Dock Time", "Sponsor", "Series", "Race", "Event Page"
@@ -173,6 +191,30 @@ fn print_schedule(schedule: &Schedule) {
         println!(
             "{:<12} {:<12} {:<12} {:<20} {:<15} {:<30} {:<30} {:<30}",
             row.date_start, row.date_end, row.first_start, row.dock_time, row.sponsor, row.series, row.race, row.series_event_page
+        );
+    }
+}
+
+fn print_csv(rows: Vec<PrintableRace>) {
+    println!("Date Start,Date End,First Start,Dock Time,Sponsor,Series,Race,Event Page");
+    for row in rows {
+        let escape = |s: &str| -> String {
+            if s.contains(',') || s.contains('"') {
+                format!("\"{}\"", s.replace("\"", "\"\""))
+            } else {
+                s.to_string()
+            }
+        };
+
+        println!("{},{},{},{},{},{},{},{}",
+            escape(&row.date_start),
+            escape(&row.date_end),
+            escape(&row.first_start),
+            escape(&row.dock_time),
+            escape(&row.sponsor),
+            escape(&row.series),
+            escape(&row.race),
+            escape(&row.series_event_page)
         );
     }
 }
