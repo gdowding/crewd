@@ -25,3 +25,15 @@ I need to be able to.
 
 ** TODO read in filesystem and store in internal data structure
 - used gemini to generate program to read data into memory
+
+* <2026-01-22 Thu>
+** TODO get something to production
+- [ ] Get happy with output columns
+- [ ] output to csv and upload to spreadsheet
+*** columns
+- date start
+- date end if different that date start
+- dock time
+- sponsor
+- series
+- race
