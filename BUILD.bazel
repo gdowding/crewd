@@ -1,4 +1,3 @@
-load("@bazel_env.bzl", "bazel_env")
 load("@rules_rust//rust:defs.bzl", "rust_binary")
 
 rust_binary(
@@ -13,12 +12,12 @@ rust_binary(
     ],
 )
 
-bazel_env(
-    name = "env",
-    toolchains = {
-        "rust": "@rules_rust//rust/toolchain:current_rust_toolchain",
-    },
-    tools = {
-        "cargo": "@rules_rust//tools/upstream_wrapper:cargo",
-    },
-)
+# bazel_env(
+#     name = "env",
+#     toolchains = {
+#         "rust": "@rules_rust//rust/toolchain:current_rust_toolchain",
+#     },
+#     tools = {
+#         "cargo": "@rules_rust//tools/upstream_wrapper:cargo",
+#     },
+# )
