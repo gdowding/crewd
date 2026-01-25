@@ -201,7 +201,7 @@ fn print_table(rows: Vec<PrintableRace>) {
 }
 
 fn print_csv(rows: Vec<PrintableRace>) {
-    println!("Date Start,Date End,First Start,Dock Time,Sponsor,Series,Race,Event Page");
+    println!("Date Start,Date End,Series,Race,Sponsor,Event Page");
     for row in rows {
         let escape = |s: &str| -> String {
             if s.contains(',') || s.contains('"') {
@@ -211,14 +211,12 @@ fn print_csv(rows: Vec<PrintableRace>) {
             }
         };
 
-        println!("{},{},{},{},{},{},{},{}",
+        println!("{},{},{},{},{},{}",
             escape(&row.date_start),
             escape(&row.date_end),
-            escape(&row.first_start),
-            escape(&row.dock_time),
-            escape(&row.sponsor),
             escape(&row.series),
             escape(&row.race),
+            escape(&row.sponsor),
             escape(&row.series_event_page)
         );
     }
