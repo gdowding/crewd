@@ -135,6 +135,11 @@ fn collect_schedule_rows(schedule: &Schedule) -> Vec<PrintableRace> {
                  // Race start time?
                  let race_start = race.properties.get("START").cloned().unwrap_or(series_first_start.clone());
 
+                 // Event page?
+                 let event_page = race.properties.get("EVENT_PAGE").cloned()
+                     .or_else(|| series.properties.get("EVENT_PAGE").cloned())
+                     .unwrap_or_default();
+
                  rows.push(PrintableRace {
                     date_start: date_start_only,
                     date_end: date_end_only,
@@ -143,7 +148,7 @@ fn collect_schedule_rows(schedule: &Schedule) -> Vec<PrintableRace> {
                     sponsor: series_sponsor.clone(),
                     series: series_name.clone(),
                     race: race.headline.clone(),
-                    series_event_page: series_event_page.clone(),
+                    series_event_page: event_page,
                 });
             }
 
