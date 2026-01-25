@@ -1,4 +1,5 @@
 use anyhow::{Context, Result};
+use chrono::{Local, NaiveDate, Duration, Datelike};
 use regex::Regex;
 use std::collections::HashMap;
 use std::env;
@@ -50,20 +51,17 @@ struct PrintableRace {
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        anyhow::bail!("Usage: {} <root-directory> [--csv]", args[0]);
+        anyhow::bail!("Usage: {} <root-directory> [--csv] [--upcoming]", args[0]);
     }
 
-    // Find the root argument (first argument that doesn't start with --)
-    // Or assume position 1 is root? The user command was `crewd data/irie-schedule`.
-    // If user types `crewd --csv data/irie-schedule`, root is index 2.
-    // I'll filter out flags.
     let root = args.iter().skip(1).find(|arg| !arg.starts_with("--"))
         .context("Missing root directory argument")?;
 
     let csv_mode = args.iter().any(|arg| arg == "--csv");
+    let upcoming_mode = args.iter().any(|arg| arg == "--upcoming");
 
     let schedule = load_schedule(root)?;
-    let rows = collect_schedule_rows(&schedule);
+    let rows = collect_schedule_rows(&schedule, upcoming_mode);
 
     if csv_mode {
         print_csv(rows);
@@ -73,7 +71,7 @@ fn main() -> Result<()> {
     Ok(())
 }
 
-fn collect_schedule_rows(schedule: &Schedule) -> Vec<PrintableRace> {
+fn collect_schedule_rows(schedule: &Schedule, upcoming: bool) -> Vec<PrintableRace> {
     let mut rows: Vec<PrintableRace> = Vec::new();
     let re_date = Regex::new(r"^\d{4}-\d{2}-\d{2}$").unwrap();
     let re_day = Regex::new(r"^[A-Z][a-z]{2}$").unwrap();
@@ -179,6 +177,33 @@ fn collect_schedule_rows(schedule: &Schedule) -> Vec<PrintableRace> {
                  }
             }
         }
+    }
+
+    if upcoming {
+        let now = Local::now().date_naive();
+        // Calculate end of the month 3 months from now
+        let mut end_year = now.year();
+        let mut end_month = now.month() + 3;
+
+        while end_month > 12 {
+            end_month -= 12;
+            end_year += 1;
+        }
+
+        // Find last day of end_month
+        let next_month_year = if end_month == 12 { end_year + 1 } else { end_year };
+        let next_month = if end_month == 12 { 1 } else { end_month + 1 };
+
+        let first_of_next = NaiveDate::from_ymd_opt(next_month_year, next_month, 1).unwrap();
+        let end_date = first_of_next - Duration::days(1);
+
+        rows.retain(|row| {
+            if let Ok(d) = NaiveDate::parse_from_str(&row.date_start, "%Y-%m-%d") {
+                d >= now && d <= end_date
+            } else {
+                false
+            }
+        });
     }
 
     rows.sort_by(|a, b| a.date_start.cmp(&b.date_start));
