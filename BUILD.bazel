@@ -3,21 +3,13 @@ load("@rules_rust//rust:defs.bzl", "rust_binary")
 rust_binary(
     name = "crewd",
     srcs = ["src/main.rs"],
+    data = ["//data:irie_schedule"],
     visibility = ["//visibility:public"],
     deps = [
         "@crates//:anyhow",
         "@crates//:chrono",
+        "@crates//:csv",
         "@crates//:regex",
         "@crates//:walkdir",
     ],
 )
-
-# bazel_env(
-#     name = "env",
-#     toolchains = {
-#         "rust": "@rules_rust//rust/toolchain:current_rust_toolchain",
-#     },
-#     tools = {
-#         "cargo": "@rules_rust//tools/upstream_wrapper:cargo",
-#     },
-# )
