@@ -1,0 +1,5 @@
+filegroup(
+    name = "irie_schedule",
+    srcs = glob(["irie-schedule/**"]),
+    visibility = ["//visibility:public"],
+)

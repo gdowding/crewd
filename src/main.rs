@@ -51,7 +51,16 @@ struct PrintableRace {
 fn main() -> Result<()> {
     let args: Vec<String> = env::args().collect();
     if args.len() < 2 {
-        anyhow::bail!("Usage: {} <root-directory> [--csv] [--upcoming]", args[0]);
+        anyhow::bail!("Usage: {} <root-directory> [--csv] [--upcoming] OR {} convert-crew <csv-file>", args[0], args[0]);
+    }
+
+    if args[1] == "convert-crew" {
+        if args.len() < 3 {
+            anyhow::bail!("Usage: {} convert-crew <csv-file>", args[0]);
+        }
+        let csv_path = &args[2];
+        convert_crew(csv_path)?;
+        return Ok(());
     }
 
     let root = args.iter().skip(1).find(|arg| !arg.starts_with("--"))
@@ -67,6 +76,37 @@ fn main() -> Result<()> {
         print_csv(rows);
     } else {
         print_table(rows);
+    }
+    Ok(())
+}
+
+fn convert_crew(path: &str) -> Result<()> {
+    let file = fs::File::open(path).context("Failed to open CSV file")?;
+    let mut rdr = csv::Reader::from_reader(file);
+
+    let headers = rdr.headers()?.clone();
+    let idx_name = headers.iter().position(|h| h == "Crew Member Name").unwrap_or(0);
+    let idx_email = headers.iter().position(|h| h == "Email Address").unwrap_or(1);
+    let idx_phone = headers.iter().position(|h| h == "Phone Number").unwrap_or(2);
+    let idx_emer_name = headers.iter().position(|h| h == "Emergency Contact Name").unwrap_or(3);
+    let idx_emer_phone = headers.iter().position(|h| h == "Emergency Contact Phone").unwrap_or(4);
+
+    for result in rdr.records() {
+        let record = result?;
+        let name = record.get(idx_name).unwrap_or("").trim();
+        let email = record.get(idx_email).unwrap_or("").trim();
+        let phone = record.get(idx_phone).unwrap_or("").trim();
+        let emer_name = record.get(idx_emer_name).unwrap_or("").trim();
+        let emer_phone = record.get(idx_emer_phone).unwrap_or("").trim();
+
+        println!("* {}", name);
+        println!(":PROPERTIES:");
+        println!(":EMAIL: {}", email);
+        println!(":PHONE: {}", phone);
+        println!(":EMERGENCY_CONTACT: {}", emer_name);
+        println!(":EMERGENCY_PHONE: {}", emer_phone);
+        println!(":END:");
+        println!();
     }
     Ok(())
 }
