@@ -103,4 +103,4 @@ lib-default-features = false
 # Optional. Defaults to "release".
 lib-profile-release = "wasm-release"
 
-bin-target = "server"
+bin-target = "backend"
