@@ -12,11 +12,10 @@ pub fn hydrate() {
 // data input
 use csv::Reader;
 use serde::Deserialize;
-use std::fs::File;
 use std::path::Path;
 
 #[derive(Clone, Debug, serde::Deserialize)]
-struct Event {
+pub struct Event {
     date_start: String,
     date_end: String,
     series: String,
@@ -25,7 +24,8 @@ struct Event {
     event_page: String,
 }
 
-fn get_schedule() -> Vec<Event> {
+
+pub fn get_schedule() -> Vec<Event> {
     let file_path = Path::new("../schedule.csv");
     let mut rdr = Reader::from_path(file_path).unwrap();
     let mut events: Vec<Event> = Vec::new();

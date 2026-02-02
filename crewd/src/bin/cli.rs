@@ -1,5 +1,5 @@
 fn main() {
-    let events = crate::get_schedule();
+    let events = crewd::get_schedule();
     for event in events {
 	println!("event: {:?}", event);
     }
