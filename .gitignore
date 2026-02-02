@@ -31,5 +31,4 @@ go.work.sum
 bazel-*
 
 # build output
-crewd-f/dist
-crewd-f/target
+crewd/target
