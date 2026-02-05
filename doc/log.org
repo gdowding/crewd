@@ -37,3 +37,5 @@ I need to be able to.
 - sponsor
 - series
 - race
+* <2026-02-04 Wed>
+** TODO read file and display in window
