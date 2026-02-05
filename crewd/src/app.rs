@@ -5,6 +5,8 @@ use leptos_router::{
     StaticSegment,
 };
 
+use leptos::logging::log;
+
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
         <!DOCTYPE html>
@@ -25,6 +27,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
 
 #[component]
 pub fn App() -> impl IntoView {
+    log!("beginning of App");
     // Provides context that manages stylesheets, titles, meta tags, etc.
     provide_meta_context();
 
