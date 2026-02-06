@@ -5,7 +5,12 @@ use leptos_router::{
     StaticSegment,
 };
 
+
+#[cfg(feature = "ssr")]
+use tokio::time::{sleep, Duration};
+
 use leptos::logging::log;
+//use leptos::task::spawn_local;
 
 pub fn shell(options: LeptosOptions) -> impl IntoView {
     view! {
@@ -24,6 +29,7 @@ pub fn shell(options: LeptosOptions) -> impl IntoView {
         </html>
     }
 }
+
 
 #[component]
 pub fn App() -> impl IntoView {
@@ -50,15 +56,48 @@ pub fn App() -> impl IntoView {
     }
 }
 
+
+#[server]
+pub async fn get_schedule(n: i32) -> Result<String, ServerFnError> {
+    log!("get_schedule");
+    sleep(Duration::from_secs(1)).await;
+    log!("after sleep");
+    Ok(format!("schedule string '{n}'"))
+    //Err(ServerFnError::ServerError("server error".to_string()))
+}
+
+
 /// Renders the home page of your application.
 #[component]
 fn HomePage() -> impl IntoView {
+    log!("begin homepage");
     // Creates a reactive value to update the button
     let count = RwSignal::new(0);
     let on_click = move |_| *count.write() += 1;
 
+
+    // let sched_data = move || { match sched_resource.get() {
+    // 	None => view! {"Loading"}.into_any(),
+    // 	Some(schedule) => view!{ schedule }.into_any()
+    // }};
+
+    let s_count = RwSignal::new(0);
+    let sched_resource = Resource::new(move || s_count, |n| get_schedule(n.get()));
+    let reload_schedule = move |_| *s_count.write() += 1;
+
     view! {
         <h1>"Welcome to Leptos!"</h1>
-        <button on:click=on_click>"Click Me: " {count}</button>
+            <button on:click=on_click>"Click Me: " {count}</button>
+	    <br/>
+
+	    <button on:click=reload_schedule>Reload Schedule</button>
+	    <br/>
+	<Suspense
+	    fallback=move || view! { <p>"Loading..."</p> }
+	>
+	{sched_resource}
+        </Suspense>
+	    <p>"after suspense"</p>
+
     }
 }
