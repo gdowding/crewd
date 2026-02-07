@@ -72,6 +72,8 @@ pub async fn get_schedule_string(n: i32) -> Result<String, ServerFnError> {
 pub async fn get_events() -> Result<Vec<Event>, ServerFnError> {
 
     log!("get_events");
+    sleep(Duration::from_secs(1)).await;
+    log!("after sleep");
     let events = vec![
 	Event{
 	    key: "sfoo".to_string(),
@@ -142,16 +144,25 @@ fn HomePage() -> impl IntoView {
 	    </For>
 
 	    <h2>server events</h2>
+
+	    <button on:click=move |_| events_r.refetch()>"Refetch events"</button>
 	<Suspense
 	    fallback=move || view! {<p>"Loading..."</p>}
 	>
 	{move ||
 	 match events_r.get() {
-	     None => view! {<p>"got nothing"</p>}.into_any(),
+	     None => view! {<p>"Loading..."</p>}.into_any(),
 	     Some(result) =>
 		 match result {
-		     Ok(events) => events.into_iter().map(move |event| view! {<p>{event.name}</p>}).collect::<Vec<_>>().into_any(),
-		     Err(e) => view! { <p>"got error"</p> }.into_any()
+		     Ok(events) => events
+			 .into_iter()
+			 .map(move |event| view! {<p>{event.name}</p>})
+			 .collect::<Vec<_>>()
+			 .into_any(),
+		     Err(e) => {
+			 log!("error {e}");
+			 view! { <p>"error loading events"</p> }.into_any()
+		     }
 		 }
 	 }
 	}
