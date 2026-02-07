@@ -39,3 +39,41 @@ I need to be able to.
 - race
 * <2026-02-04 Wed>
 ** TODO read file and display in window
+* <2026-02-05 Thu>
+** was able to call for data on server and display
+** update call to server to get vector of data and display
+SCHEDULED: <2026-02-05 Thu>
+Stuck on getting the data from the server. Compiler error where the rendering is suppose to happen.
+
+This is a little covoluted, but it looks like when it gets to e.name, e should be an element in the vector not the whole vector. Maybe I need to verify the get_events function.
+
+
+#+begin_src rust
+	<Suspense
+	    fallback= move || view! {<p>"Loading..."</p>}
+	>
+	{move || events_r.get().map(|es| {
+	    es.into_iter().map(|e| {
+		 view!{ <li>{e.name}</li> }
+	     }).collect_view()
+	 })}
+	    </Suspense>
+#+end_src
+
+#+begin_example
+error[E0609]: no field `name` on type `Vec<app::Event>`
+   --> src/app.rs:149:18
+    |
+149 |          view!{ <li>{e.name}</li> }
+    |                        ^^^^ unknown field
+#+end_example
+
+
+Some findings
+
+- iter can operate on an Option. It will return either Some or None depending on the contents of the option.
+- some things have IntoView trait like Option, Result, and String. That is why simply returning a string "just works".
+- if using a match, all branches need to produce the same result. Use r.into_any() for different types of views since each element is its own view type.
+- not sure why I was getting unknown field above. Not sure it matters now.
+- would prefer if iter only worked on sequences not enums
+- would prefer to opt into the convenience of IntoView trait automatically working for String when calling server_function
