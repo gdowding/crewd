@@ -77,3 +77,55 @@ Some findings
 - not sure why I was getting unknown field above. Not sure it matters now.
 - would prefer if iter only worked on sequences not enums
 - would prefer to opt into the convenience of IntoView trait automatically working for String when calling server_function
+
+* clean up suspense
+
+** handle waiting for api to return
+#+begin_src rust
+	<Suspense
+	    fallback=move || view! {<p>"Loading..."</p>}
+	>
+	{move ||
+	 match events_r.get() {
+	     None => view! {<p>"Loading..."</p>}.into_any(),
+	     Some(result) =>
+		 match result {
+		     Ok(events) => events
+			 .into_iter()
+			 .map(move |event| view! {<p>{event.name}</p>})
+			 .collect::<Vec<_>>()
+			 .into_any(),
+		     Err(e) => {
+			 log!("error {e}");
+			 view! { <p>"error loading events"</p> }.into_any()
+		     }
+		 }
+	 }
+	}
+	    </Suspense>
+#+end_src
+
+** Use suspense to handling waiting for api
+
+#+begin_src rust
+	<Suspense
+	    fallback=move || view! {<p>"Loading..."</p>}
+	>
+	{move || Suspend::new(async move {
+	    let events = events_r.await;
+	    match events {
+		Ok(events) => events
+		    .into_iter()
+		    .map(move |event| view! {<p>{event.name}</p>})
+		    .collect::<Vec<_>>()
+		    .into_any(),
+		Err(e) => {
+		    log!("error {e}");
+		    view! { <p>"error loading events"</p> }.into_any()
+		}
+	    }
+	})}
+	</Suspense>
+#+end_src
+
+So Suspend just allows remvong the None, Some matching.

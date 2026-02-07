@@ -149,24 +149,21 @@ fn HomePage() -> impl IntoView {
 	<Suspense
 	    fallback=move || view! {<p>"Loading..."</p>}
 	>
-	{move ||
-	 match events_r.get() {
-	     None => view! {<p>"Loading..."</p>}.into_any(),
-	     Some(result) =>
-		 match result {
-		     Ok(events) => events
-			 .into_iter()
-			 .map(move |event| view! {<p>{event.name}</p>})
-			 .collect::<Vec<_>>()
-			 .into_any(),
-		     Err(e) => {
-			 log!("error {e}");
-			 view! { <p>"error loading events"</p> }.into_any()
-		     }
-		 }
-	 }
-	}
-	    </Suspense>
+	{move || Suspend::new(async move {
+	    let events = events_r.await;
+	    match events {
+		Ok(events) => events
+		    .into_iter()
+		    .map(move |event| view! {<p>{event.name}</p>})
+		    .collect::<Vec<_>>()
+		    .into_any(),
+		Err(e) => {
+		    log!("error {e}");
+		    view! { <p>"error loading events"</p> }.into_any()
+		}
+	    }
+	})}
+	</Suspense>
 
 
 
