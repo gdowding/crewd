@@ -1,0 +1,19 @@
+* Instructions for goose
+
+** Project description
+
+I am working on a project to manage my yact racing schedule and crew.
+
+I want to use Rust since it has good type safety and compiles to a fast runtime.
+
+Here are some of the use cases
+
+*** Create Schedule
+
+I get a list of upcoming races from the Seattle Area Racing Calendar ([[https://48north.com/sarc/][SARC]]) and create a calendar of races based on the ones that I will likey do and those that I might do.
+
+In order to make it easy for me to edit this calendar I am using some org-mode files.
+
+Once the calendar is created I want to display this in a web application so crew members can see the upcoming races and sign up for them.
+
+To keep things simple for now I am using regular files in org-mode format to keep track of the races and who has signed up. The files are in the directory data/irie-schedule. There is a subdirectory for each year. In that directory there is a subdirectory for each race series. In that directory is a file series.org which is an org mode file. The top level properties include properties to the series as a whole. After that there will be events listed as top level headlines. An event can be a race, delivery, maintainence, or social gathering. The SCHEDULED: line after the headline indicateds the date of the event. There could be additional properties that are specific to that event.

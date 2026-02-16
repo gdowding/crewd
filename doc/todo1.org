@@ -66,8 +66,6 @@ syncronize between org file and spreadsheet
 - bring together all sign ups into schedule
 - notify people through email, signal.
 
-** TODO get list of series that have races in the next three months
-
 ** TODO get people to sign up for upcoming races
 - [ ] synchronize changes between crew list spreadsheet and crew-list.org
   - [ ] convert csv to org-mode
@@ -79,26 +77,8 @@ syncronize between org file and spreadsheet
 - [ ] generate a sign up spreadsheet and upload to google sheets
 
 
-
-** TODO Create sign up for a series
-
-** TODO Notify people that schedule is available and crew needed
-
-** TODO When near race time notifiy people that are signed up and provide them with additional information
-- dock time
+** TODO
 
 ** TODO add weather and tide predictions
 - [ ] add location for race
 - [ ] add link to tide predicitons or fetch data for predcitions or both
-
-
-* sprint 1
-SCHEDULED: <2026-02-07 Sat>
-** TODO read csv schedule and display on web page
-** TODO deploy to some provider
-** TODO share with team
-
-** TODO refactor into workspace project
-SCHEDULED: <2026-02-15 Sun>
-
-having some problems adding business logic and running tests within the leptos context. I wil split out the business logic to a separate crate so I can use normal rust tools to test, etc.

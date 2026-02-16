@@ -1,0 +1,3 @@
+[workspace]
+members = ["crewd_data", "crewd_ui"]
+resolver = "3"

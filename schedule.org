@@ -1,0 +1,52 @@
+| Date Start |   Date End | First Start | Dock Time | Sponsor     | Series                    | Race                                  | Event Page                                            |
+| 2026-02-21 |            |       11:00 |     09:00 | styc        | Snowbird Race Series      | Race 4                                | https://www.styc.org/Snowbird-Series                  |
+| 2026-02-28 |            |             |           | cyc seattle | Center Sound Series       | CSS#1 - Blakely Rock Race             | https://cycseattle.theclubspot.com/regatta/gRVV6VV1Rj |
+| 2026-03-06 |            |             |           | styc        | Triple Sound Series       | TODO Register for race to the straits |                                                       |
+| 2026-03-07 |            |             |           | cyc seattle | Center Sound Series       | CSS#2 - Three Tree Point Race         | https://cycseattle.theclubspot.com/regatta/gRVV6VV1Rj |
+| 2026-03-14 |            |       11:00 |     09:00 | styc        | Snowbird Race Series      | Race 5                                | https://www.styc.org/Snowbird-Series                  |
+| 2026-03-21 |            |             |           | cyc seattle | Center Sound Series       | CSS#3 - Possession Point Race         | https://cycseattle.theclubspot.com/regatta/gRVV6VV1Rj |
+| 2026-04-11 |            |       11:00 |           | styc        | Blakely Rock Benefit Race | Race 1                                | https://www.styc.org/Blakely-Rock-Benefit-Race        |
+| 2026-04-13 |            |       18:15 |           | styc        | Ballard Cup I             | Race 1                                | https://www.styc.org/Ballard-Cup-Series-I             |
+| 2026-04-20 |            |       18:15 |           | styc        | Ballard Cup I             | Race 2                                | https://www.styc.org/Ballard-Cup-Series-I             |
+| 2026-04-25 | 2026-04-26 |             |           | syc         | Tri-Island                | Smith Island                          |                                                       |
+| 2026-04-27 |            |       18:15 |           | styc        | Ballard Cup I             | Race 3                                | https://www.styc.org/Ballard-Cup-Series-I             |
+| 2026-05-02 | 2026-05-03 |             |           | styc        | Triple Sound Series       | Race to the Straits                   |                                                       |
+| 2026-05-04 |            |       18:15 |           | styc        | Ballard Cup I             | Race 4                                | https://www.styc.org/Ballard-Cup-Series-I             |
+| 2026-05-09 |            |             |           | syc         | Tri-Island                | Vashon Island / Pt. Robinson          |                                                       |
+| 2026-05-11 |            |       18:15 |           | styc        | Ballard Cup I             | Race 5                                | https://www.styc.org/Ballard-Cup-Series-I             |
+| 2026-05-18 |            |       18:15 |           | styc        | Ballard Cup I             | Race 6                                | https://www.styc.org/Ballard-Cup-Series-I             |
+| 2026-05-30 |            |             |           | syc         | Tri-Island                | Blake Island                          |                                                       |
+| 2026-06-01 |            |       18:15 |           | styc        | Ballard Cup II            | Race 1                                | https://www.styc.org/Ballard-Cup-Series-II            |
+| 2026-06-08 |            |       18:15 |           | styc        | Ballard Cup II            | Race 2                                | https://www.styc.org/Ballard-Cup-Series-II            |
+| 2026-06-15 |            |       18:15 |           | styc        | Ballard Cup II            | Race 3                                | https://www.styc.org/Ballard-Cup-Series-II            |
+| 2026-06-22 |            |       18:15 |           | styc        | Ballard Cup II            | Race 4                                | https://www.styc.org/Ballard-Cup-Series-II            |
+| 2026-06-29 |            |       18:15 |           | styc        | Ballard Cup II            | Race 5                                | https://www.styc.org/Ballard-Cup-Series-II            |
+| 2026-07-10 |            |             |           | ohyc        | Whidbey Summer Classic    | multiple races                        | https://www.whidbeyclassic.com                        |
+| 2026-07-11 |            |             |           | ohyc        | Whidbey Summer Classic    | multiple races                        | https://www.whidbeyclassic.com                        |
+| 2026-07-12 |            |             |           | ohyc        | Whidbey Summer Classic    | multiple races                        | https://www.whidbeyclassic.com                        |
+| 2026-07-13 |            |       18:15 |           | styc        | Ballard Cup II            | Race 6                                | https://www.styc.org/Ballard-Cup-Series-II            |
+| 2026-07-20 |            |             |           | rwb         | Race Week Bellingham      | multiple races                        | https://www.raceweekpnw.com                           |
+| 2026-07-21 |            |             |           | rwb         | Race Week Bellingham      | multiple races                        | https://www.raceweekpnw.com                           |
+| 2026-07-22 |            |             |           | rwb         | Race Week Bellingham      | multiple races                        | https://www.raceweekpnw.com                           |
+| 2026-07-23 |            |             |           | rwb         | Race Week Bellingham      | multiple races                        | https://www.raceweekpnw.com                           |
+| 2026-07-24 |            |             |           | rwb         | Race Week Bellingham      | multiple races                        | https://www.raceweekpnw.com                           |
+| 2026-07-27 |            |       18:15 |           | styc        | Ballard Cup III           | Race 1                                | https://www.styc.org/Ballard-Cup-Series-III           |
+| 2026-08-01 | 2026-08-02 |             |           | styc        | Triple Sound Series       | Down the Sound                        |                                                       |
+| 2026-08-03 |            |       18:15 |           | styc        | Ballard Cup III           | Race 2                                | https://www.styc.org/Ballard-Cup-Series-III           |
+| 2026-08-10 |            |       18:15 |           | styc        | Ballard Cup III           | Race 3                                | https://www.styc.org/Ballard-Cup-Series-III           |
+| 2026-08-17 |            |       18:15 |           | styc        | Ballard Cup III           | Race 4                                | https://www.styc.org/Ballard-Cup-Series-III           |
+| 2026-08-23 |            |             |           | styc        | Triple Sound Series       | J&J Race                              |                                                       |
+| 2026-08-24 |            |       18:15 |           | styc        | Ballard Cup III           | Race 5                                | https://www.styc.org/Ballard-Cup-Series-III           |
+| 2026-08-29 |            |             |           | cyc seattle | Lake Moonlight Race       | Race 1                                |                                                       |
+| 2026-08-31 |            |       18:15 |           | styc        | Ballard Cup III           | Race 6                                | https://www.styc.org/Ballard-Cup-Series-III           |
+| 2026-09-11 |            |             |           | byc         | PITCH                     | multiple races                        |                                                       |
+| 2026-09-11 |            |             |           | oiyc        | Round the County          | tbd - dates not published             | https://roundthecounty.com                            |
+| 2026-09-12 |            |             |           | byc         | PITCH                     | multiple races                        |                                                       |
+| 2026-09-13 |            |             |           | byc         | PITCH                     | multiple races                        |                                                       |
+| 2026-09-19 |            |       11:00 |           | styc        | Fall Regatta              | multiple races                        | https://www.styc.org/Fall-Regatta                     |
+| 2026-10-03 |            |             |           | cyc edmonds | Foul Weather Bluff        | race                                  |                                                       |
+| 2026-10-10 |            |             |           | cyc seattle | PSSC Big Boats            | multiple races                        |                                                       |
+| 2026-10-11 |            |             |           | cyc seattle | PSSC Big Boats            | multiple races                        |                                                       |
+| 2026-10-23 |            |             |           | syc         | Grand Prix XLIX Regatta   | multiple races                        |                                                       |
+| 2026-10-24 |            |             |           | syc         | Grand Prix XLIX Regatta   | multiple races                        |                                                       |
+| 2026-10-25 |            |             |           | syc         | Grand Prix XLIX Regatta   | multiple races                        |                                                       |

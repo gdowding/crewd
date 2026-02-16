@@ -31,4 +31,6 @@ go.work.sum
 bazel-*
 
 # build output
-crewd/target
+target
+
+.agent-shell
