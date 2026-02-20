@@ -95,6 +95,10 @@ syncronize between org file and spreadsheet
 * sprint 1
 SCHEDULED: <2026-02-07 Sat>
 ** TODO read csv schedule and display on web page
+- [ ] created lib file to read csv
+- [ ] see if I can get bazel to build leptos
+- [ ] set use data lib in ui to get Vec of events
+- [ ] display events in list or table
 ** TODO deploy to some provider
 ** TODO share with team
 
