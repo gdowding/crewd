@@ -36,3 +36,5 @@ target
 .agent-shell
 
 rust-project.json
+
+WORKSPACE
