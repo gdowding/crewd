@@ -1,5 +1,5 @@
 load("@crates//:defs.bzl", "aliases", "all_crate_deps")
-load("@rules_rust//rust:defs.bzl", "rust_library")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_library")
 
 rust_library(
     name = "lib",
@@ -14,4 +14,14 @@ rust_library(
     deps = all_crate_deps(
         normal = True,
     ),
+)
+
+rust_binary(
+    name = "crewd",
+    srcs = [
+        "src/main.rs",
+    ],
+    deps = all_crate_deps(normal = True) + [
+        "lib",
+    ],
 )

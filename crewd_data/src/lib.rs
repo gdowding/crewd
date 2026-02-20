@@ -1,7 +1,6 @@
-
 use chrono::NaiveDate;
 use serde::Deserialize;
-use std::error::Error;
+use anyhow::Result;
 
 #[derive(Debug, Deserialize)]
 pub struct Event {
@@ -13,8 +12,9 @@ pub struct Event {
     event_page: Option<String>,
 }
 
-pub fn read_schedule() -> Result<Vec<Event>, Box<dyn Error>> {
-    let mut rdr = csv::Reader::from_path("schedule.csv")?;
+pub fn read_schedule(filename: String) -> Result<Vec<Event>> {
+    println!("filename in read_schedule: {filename}");
+    let mut rdr = csv::Reader::from_path(filename)?;
     let mut schedule = Vec::new();
     for result in rdr.deserialize() {
         let record: Event = result?;
