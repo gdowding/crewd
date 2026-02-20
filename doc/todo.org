@@ -98,7 +98,13 @@ SCHEDULED: <2026-02-07 Sat>
 ** TODO deploy to some provider
 ** TODO share with team
 
-** TODO refactor into workspace project
+** DONE refactor into workspace project
 SCHEDULED: <2026-02-15 Sun>
 
 having some problems adding business logic and running tests within the leptos context. I wil split out the business logic to a separate crate so I can use normal rust tools to test, etc.
+
+
+This is mostly done. I have an error due to profile being set in child project instead of main project
+
+** TODO add a main to data to output the schedule to the console
+SCHEDULED: <2026-02-15 Sun>

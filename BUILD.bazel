@@ -1,15 +1,15 @@
-load("@rules_rust//rust:defs.bzl", "rust_binary")
+# load("@rules_rust//rust:defs.bzl", "rust_binary")
 
-rust_binary(
-    name = "crewd",
-    srcs = ["src/main.rs"],
-    data = ["//data:irie_schedule"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "@crates//:anyhow",
-        "@crates//:chrono",
-        "@crates//:csv",
-        "@crates//:regex",
-        "@crates//:walkdir",
-    ],
-)
+# rust_binary(
+#     name = "crewd",
+#     srcs = ["src/main.rs"],
+#     data = ["//data:irie_schedule"],
+#     visibility = ["//visibility:public"],
+#     deps = [
+#         "@crates//:anyhow",
+#         "@crates//:chrono",
+#         "@crates//:csv",
+#         "@crates//:regex",
+#         "@crates//:walkdir",
+#     ],
+# )
