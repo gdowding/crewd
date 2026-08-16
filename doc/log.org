@@ -1,0 +1,207 @@
+* <2026-01-17 Sat>
+** I need to make a shareable calendar for upcoming races
+*** TODO add dock time
+*** TODO add time limit
+*** TODO add rsvp
+* <2026-01-19 Mon>
+Change of direction
+
+Instead of finding libraries that meet my needs and adapting to them, I am thinking I will make more progress and enjoy this more if I am working direcly on the code. I realized that using a database, an ORM and a querying library is taking time away from working on the business logic. I can use tools like emacs org-mode for the management UI, the file system for storage, google sheets/calendar for user UI.
+
+I need to be able to.
+
+- read in from file system using structure to manage series and race relationships
+- parse the org format being used in management UI files
+- read in crew list from sheets
+- read in ics from calendar for invit responses
+- read in csv from sheets for sign ups
+- merge data from org and sheets
+  - figure out what data can come from calendar and sheets
+    - sign ups
+- output calendar ics
+- output csv for sheets
+  - complete schedule
+  - indivdual races
+
+** TODO read in filesystem and store in internal data structure
+- used gemini to generate program to read data into memory
+
+* <2026-01-22 Thu>
+** TODO get something to production
+- [ ] Get happy with output columns
+- [ ] output to csv and upload to spreadsheet
+*** columns
+- date start
+- date end if different that date start
+- dock time
+- sponsor
+- series
+- race
+* <2026-02-04 Wed>
+** TODO read file and display in window
+* <2026-02-05 Thu>
+** was able to call for data on server and display
+** update call to server to get vector of data and display
+SCHEDULED: <2026-02-05 Thu>
+Stuck on getting the data from the server. Compiler error where the rendering is suppose to happen.
+
+This is a little covoluted, but it looks like when it gets to e.name, e should be an element in the vector not the whole vector. Maybe I need to verify the get_events function.
+
+
+#+begin_src rust
+	<Suspense
+	    fallback= move || view! {<p>"Loading..."</p>}
+	>
+	{move || events_r.get().map(|es| {
+	    es.into_iter().map(|e| {
+		 view!{ <li>{e.name}</li> }
+	     }).collect_view()
+	 })}
+	    </Suspense>
+#+end_src
+
+#+begin_example
+error[E0609]: no field `name` on type `Vec<app::Event>`
+   --> src/app.rs:149:18
+    |
+149 |          view!{ <li>{e.name}</li> }
+    |                        ^^^^ unknown field
+#+end_example
+
+
+Some findings
+
+- iter can operate on an Option. It will return either Some or None depending on the contents of the option.
+- some things have IntoView trait like Option, Result, and String. That is why simply returning a string "just works".
+- if using a match, all branches need to produce the same result. Use r.into_any() for different types of views since each element is its own view type.
+- not sure why I was getting unknown field above. Not sure it matters now.
+- would prefer if iter only worked on sequences not enums
+- would prefer to opt into the convenience of IntoView trait automatically working for String when calling server_function
+
+* clean up suspense
+
+** handle waiting for api to return
+#+begin_src rust
+	<Suspense
+	    fallback=move || view! {<p>"Loading..."</p>}
+	>
+	{move ||
+	 match events_r.get() {
+	     None => view! {<p>"Loading..."</p>}.into_any(),
+	     Some(result) =>
+		 match result {
+		     Ok(events) => events
+			 .into_iter()
+			 .map(move |event| view! {<p>{event.name}</p>})
+			 .collect::<Vec<_>>()
+			 .into_any(),
+		     Err(e) => {
+			 log!("error {e}");
+			 view! { <p>"error loading events"</p> }.into_any()
+		     }
+		 }
+	 }
+	}
+	    </Suspense>
+#+end_src
+
+** Use suspense to handling waiting for api
+
+#+begin_src rust
+	<Suspense
+	    fallback=move || view! {<p>"Loading..."</p>}
+	>
+	{move || Suspend::new(async move {
+	    let events = events_r.await;
+	    match events {
+		Ok(events) => events
+		    .into_iter()
+		    .map(move |event| view! {<p>{event.name}</p>})
+		    .collect::<Vec<_>>()
+		    .into_any(),
+		Err(e) => {
+		    log!("error {e}");
+		    view! { <p>"error loading events"</p> }.into_any()
+		}
+	    }
+	})}
+	</Suspense>
+#+end_src
+
+So Suspend just allows remvong the None, Some matching.
+
+* <2026-08-01 Sat>
+** Starting over again
+** Literate programming / prototype mode
+** trying buck2 build system
+*** create shell.nix to install buck2
+*** buck2 init
+
+#+begin_src sh
+buck2 init --name crewd --git
+#+end_src
+
+The =--git= flag is to tell buck2 to clone prelude. It looks like it is kind of a standard library for buck2.
+
+The version of buck2 was old and did not match up to prelude. I ended up working around it by installing buckle which is a launcher for buck2. Not exactly what I wanted, but it does work.
+
+Seems pretty responsive compared to bazel.
+
+** TODO start on actual project
+
+
+* <2026-08-02 Sun>
+
+Find something to work on.
+
+** work on data storage and representation
+
+** TODO get report for upcoming race
+
+- [ ] command to get crew list for upcoming race
+- [ ] reminder message for upcoming race
+
+
+* CLI
+** TODO print list of upcoming races
+
+* <2026-08-06 Thu>
+** work on cli
+
+I am trying to understand blocks. It isn't exactly like a function.
+
+Can't call a block with no arguments need to at least provide @ (nothing/null). Is that right? or declare it as a header
+
+control flow with if. Ended up using an immediate block. The defined If was evaluating the block whether the contition was true or not. This was a problem since it was outputting error messages incorrectly.
+
+Formatting multiline output. Can't modify Out with each so have to join strings and make a single Out call
+
+
+* <2026-08-07 Fri>
+
+get count of crew for an event to see if sufficient crew is signed up or further recruiting is required. I was trying to use under to add the count to the key of races, but I think that won't work since undo probably needs to be replaced by the same shape. Not sure if that is true, but I couldn't get it to work. What did work was append cells
+
+Don't want to commit current code since it includes full names of some people based on their signal id.
+
+* <2026-08-08 Sat>
+
+- [ ] add location to event data structure
+- [ ] add sign up deadline for event
+- [ ] filter events that are just for me eg. admin events
+- [ ] get users to sign up
+- [ ] clean out sign up data from downloaded js file
+- [ ] get events from database
+- [ ] paginate through events
+- [ ] results for completed events
+- [ ] actual crew for event
+- [ ] change assigned crew to Crew
+- [ ] clean up data that is in source to remove names
+
+
+** deploy
+
+https://windward-racing-g4mm4uyqo-irie2.vercel.app
+
+Had to add env variables to get it to work
+
+** TODO reset password

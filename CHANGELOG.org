@@ -1,0 +1,5 @@
+* Revision history for crewd
+
+** <2026-08-16 Sun>
+
+- Initial setup work in progress
