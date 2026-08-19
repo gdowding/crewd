@@ -20,6 +20,12 @@ executable crewd
   main-is: crewd.hs
   build-depends:
                 base >= 4.2 && < 5,
+                bytestring,
+                directory,
+                filepath,
+                HTTP,
+                http-client,
+                http-conduit,
                 tagsoup >= 0.14.8 && < 1,
                 split
   default-language: Haskell2010

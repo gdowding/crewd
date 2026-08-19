@@ -1,10 +1,11 @@
 module Main (main) where
 
 import System.IO
-import Text.HTML.TagSoup
 import Data.Char (isSpace)
 import Data.List (intercalate, dropWhileEnd)
 import Data.List.Split (splitOn)
+import Network.HTTP
+import Text.HTML.TagSoup
 
 
 
