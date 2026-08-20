@@ -75,29 +75,39 @@ getRaceInfo t =
   in
     map (escapeCSV . trimEnd . innerText) ps
 
+
+getUrl regatta series year race =
+  "https://race.styc.org/race_info/" ++ r ++ "/" ++ s ++ "/" ++ y ++ "/" ++ "race" ++ race ++ ".htm"
+  where
+    r = map (\x -> if x == ' ' then '_' else x) regatta
+    s  = "Series" ++ series
+    y = show year
+
 main :: IO ()
 main = do
   do
-    contents <- readFile "/Users/gdowding/git/github/gdowding/crewd/results/race2.htm"
-    let tags = parseTags contents
-    -- Get series, date and sponsor for results
-    let raceHeadings = ["series", "date", "sponsor"]
-    let raceInfo = getRaceInfo tags
-    -- Get results for each class
-    let resultsSrc = partitions ( ~== "<p class=classtitle>" ) tags
-    let results = map getResults resultsSrc
-    -- The heading for each class is the same. It should only be incouded in the output once.
-    -- So get the class result heading from the first result.
-    -- Need to prepend the raceInfo headings
-    let h = fst $ head results
-    printTable [raceHeadings ++ h]
-    -- Results
-    let ds = map snd results
-    printTable $ map ((++) raceInfo) $ concat ds
-    -- let series = trimEnd . innerText $ raceInfo !! 0
-    -- let raceDate = trimEnd . innerText $ raceInfo !! 1
-    -- let clubName = trimEnd . innerText $ raceInfo !! 3
-    -- putStrLn series
-    -- putStrLn raceDate
-    -- putStrLn clubName
-    -- let raceDate = dropWhile
+    putStrLn $ getUrl "Ballard Cup" "III" 2026 "1"
+
+    -- contents <- readFile "/Users/gdowding/git/github/gdowding/crewd/results/race2.htm"
+    -- let tags = parseTags contents
+    -- -- Get series, date and sponsor for results
+    -- let raceHeadings = ["series", "date", "sponsor"]
+    -- let raceInfo = getRaceInfo tags
+    -- -- Get results for each class
+    -- let resultsSrc = partitions ( ~== "<p class=classtitle>" ) tags
+    -- let results = map getResults resultsSrc
+    -- -- The heading for each class is the same. It should only be incouded in the output once.
+    -- -- So get the class result heading from the first result.
+    -- -- Need to prepend the raceInfo headings
+    -- let h = fst $ head results
+    -- printTable [raceHeadings ++ h]
+    -- -- Results
+    -- let ds = map snd results
+    -- printTable $ map ((++) raceInfo) $ concat ds
+    -- -- let series = trimEnd . innerText $ raceInfo !! 0
+    -- -- let raceDate = trimEnd . innerText $ raceInfo !! 1
+    -- -- let clubName = trimEnd . innerText $ raceInfo !! 3
+    -- -- putStrLn series
+    -- -- putStrLn raceDate
+    -- -- putStrLn clubName
+    -- -- let raceDate = dropWhile
