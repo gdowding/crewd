@@ -18,7 +18,11 @@ import Data.Time.Calendar (Day, toGregorian)
 import Data.Time.Format (defaultTimeLocale,  parseTimeM)
 import qualified Data.Vector as V
 import GHC.Generics (Generic)
-import Network.HTTP
+import Network.HTTP.Simple
+import qualified Network.HTTP.Client as CL
+import System.Directory (createDirectoryIfMissing)
+import System.FilePath ((</>), dropDrive, takeFileName, takeDirectory)
+
 import Text.HTML.TagSoup
 
 
@@ -112,6 +116,7 @@ getRaceInfo t =
 
 -- getUrl :: Text -> Text -> Day -> Text -> String
 -- getUrl regatta series date race =
+-- Currently hardcoded to Ballard Cup events only
 
 getEvtUrl :: Event -> String
 getEvtUrl Event {regatta = r, series = s, start_date = d, race =n} =
@@ -124,28 +129,37 @@ getEvtUrl Event {regatta = r, series = s, start_date = d, race =n} =
     series'  = "Series" ++ unpack s
     race' = unpack n
 
-printUrls :: String -> IO ()
-printUrls = putStrLn
+------------------------------------------------------------
+-- Manage download directory.
+
+downloadDirectory = "/Users/gdowding/git/github/gdowding/crewd/results"
+
+fullPath req =
+  downloadDirectory </> dirPath
+  where
+    reqHost = BC.unpack $ CL.host req
+    reqPath = BC.unpack $ CL.path req
+    dirPath = reqHost </> dropDrive (takeDirectory reqPath)
+
+-- can optimize this by removing duplicate directories
+createDirForResult url =
+  do
+      req <- parseRequest url
+      print $ fullPath req
+      createDirectoryIfMissing True $ fullPath req
 
 
-
--- TODO: convert event to url
-
-
-getEvtUrl' Event { regatta = "Ballard Cup" } =
-  "BallardCup"
-
-
-getEvtUrl' Event { regatta = "Foo" } =
-  "Some Other Regatta"
-
+------------------------------------------------------------
+-- Pipeline
 
 -- Only process events that have already occoured.
 runPipeline :: V.Vector Event -> IO ()
 runPipeline events = do
   currentDay <- utctDay <$> getCurrentTime
   let urls = V.map getEvtUrl $ V.filter (\e -> start_date e < currentDay) events
-  V.forM_ urls print
+  V.forM_ urls createDirForResult
+
+
 
 main :: IO ()
 main = do
@@ -155,29 +169,3 @@ main = do
     case decodeByName csvData of
       Left err -> Exit.die err
       Right(_, v) -> runPipeline (v :: V.Vector Event)
-
-    -- putStrLn $ getUrl "Ballard Cup" "III" 2026 "1"
-
-    -- contents <- readFile "/Users/gdowding/git/github/gdowding/crewd/results/race2.htm"
-    -- let tags = parseTags contents
-    -- -- Get series, date and sponsor for results
-    -- let raceHeadings = ["series", "date", "sponsor"]
-    -- let raceInfo = getRaceInfo tags
-    -- -- Get results for each class
-    -- let resultsSrc = partitions ( ~== "<p class=classtitle>" ) tags
-    -- let results = map getResults resultsSrc
-    -- -- The heading for each class is the same. It should only be incouded in the output once.
-    -- -- So get the class result heading from the first result.
-    -- -- Need to prepend the raceInfo headings
-    -- let h = fst $ head results
-    -- printTable [raceHeadings ++ h]
-    -- -- Results
-    -- let ds = map snd results
-    -- printTable $ map ((++) raceInfo) $ concat ds
-    -- -- let series = trimEnd . innerText $ raceInfo !! 0
-    -- -- let raceDate = trimEnd . innerText $ raceInfo !! 1
-    -- -- let clubName = trimEnd . innerText $ raceInfo !! 3
-    -- -- putStrLn series
-    -- -- putStrLn raceDate
-    -- -- putStrLn clubName
-    -- -- let raceDate = dropWhile
