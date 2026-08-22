@@ -141,12 +141,32 @@ fullPath req =
     reqPath = BC.unpack $ CL.path req
     dirPath = reqHost </> dropDrive (takeDirectory reqPath)
 
+
+localPath req =
+  downloadDirectory </> filePath
+  where
+    reqHost = BC.unpack $ CL.host req
+    reqPath = BC.unpack $ CL.path req
+    filePath = reqHost </> dropDrive reqPath
+
 -- can optimize this by removing duplicate directories
 createDirForResult url =
   do
       req <- parseRequest url
       print $ fullPath req
       createDirectoryIfMissing True $ fullPath req
+
+
+------------------------------------------------------------
+-- fetch result
+
+fetchResult url =
+  do
+    req <- parseRequest url
+    response <- httpBS req
+    let bodyContent = getResponseBody response
+    let filePath = localPath req
+    BS.writeFile filePath bodyContent
 
 
 ------------------------------------------------------------
@@ -158,6 +178,9 @@ runPipeline events = do
   currentDay <- utctDay <$> getCurrentTime
   let urls = V.map getEvtUrl $ V.filter (\e -> start_date e < currentDay) events
   V.forM_ urls createDirForResult
+  let files = V.forM urls fetchResult
+  -- TODO: parse and store results
+  putStrLn "finish"
 
 
 
