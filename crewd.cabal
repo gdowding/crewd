@@ -22,10 +22,15 @@ executable crewd
                 base >= 4.2 && < 5,
                 bytestring,
                 directory,
+                cassava,
                 filepath,
                 HTTP,
                 http-client,
                 http-conduit,
                 tagsoup >= 0.14.8 && < 1,
-                split
+                split,
+                text,
+                time,
+                vector
+
   default-language: Haskell2010
