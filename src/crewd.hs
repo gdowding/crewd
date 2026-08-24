@@ -14,6 +14,7 @@ import Data.List (intercalate, dropWhileEnd)
 import Data.List.Split (splitOn)
 import Data.Time.Clock (getCurrentTime, utctDay)
 import Data.Text (Text, pack, unpack)
+import qualified Data.Text.Encoding as TE
 import Data.Time.Calendar (Day, toGregorian)
 import Data.Time.Format (defaultTimeLocale,  parseTimeM)
 import qualified Data.Vector as V
@@ -21,7 +22,7 @@ import GHC.Generics (Generic)
 import Network.HTTP.Simple
 import qualified Network.HTTP.Client as CL
 import System.Directory (createDirectoryIfMissing)
-import System.FilePath ((</>), dropDrive, takeFileName, takeDirectory)
+import System.FilePath ((</>), (-<.>), dropDrive, takeFileName, takeDirectory)
 
 import Text.HTML.TagSoup
 
@@ -96,6 +97,9 @@ getValuesFromResult r =
     (dataHeadings, dataValues)  -- (dataHeadings, map getRowData tdPart)
 
 
+-- get header and results for a single class
+
+getResults :: [Tag String] -> ([String], [[String]])
 getResults r =
   let (cHead, cData) = getHeadFromResult r
       (dHead, dValues) = getValuesFromResult r
@@ -103,6 +107,8 @@ getResults r =
   in
     (cHead ++ dHead, classDataValues)
 
+
+printTable :: [[String]] -> IO ()
 printTable table = putStr (unlines (map (intercalate ",") table))
 
 getRaceInfo :: [Tag String] -> [[Char]]
@@ -149,24 +155,37 @@ localPath req =
     reqPath = BC.unpack $ CL.path req
     filePath = reqHost </> dropDrive reqPath
 
--- can optimize this by removing duplicate directories
-createDirForResult url =
-  do
-      req <- parseRequest url
-      print $ fullPath req
-      createDirectoryIfMissing True $ fullPath req
-
 
 ------------------------------------------------------------
--- fetch result
+-- fetch result. Save result to filePath and return body of response.
 
-fetchResult url =
+fetchResult req filePath =
   do
-    req <- parseRequest url
     response <- httpBS req
     let bodyContent = getResponseBody response
-    let filePath = localPath req
     BS.writeFile filePath bodyContent
+    return bodyContent
+
+processResult event =
+  do
+    let url = getEvtUrl event
+    req <- parseRequest url
+    let filePath = localPath req
+    -- Is this a race condition if multiple processes are attempting to create directory at same time?
+    -- or is it thread safe?
+    createDirectoryIfMissing True $ takeDirectory filePath
+    respBody <- fetchResult req filePath
+    let tags = parseTags $ unpack (TE.decodeUtf8 respBody)
+    let classes = partitions (~== ("<p class=classtitle>" :: String)) tags
+    let results = map getResults classes
+    let c1 = (fst . head) results
+    print filePath
+    printTable [c1]
+
+
+
+
+    -- parse and save
 
 
 ------------------------------------------------------------
@@ -176,10 +195,8 @@ fetchResult url =
 runPipeline :: V.Vector Event -> IO ()
 runPipeline events = do
   currentDay <- utctDay <$> getCurrentTime
-  let urls = V.map getEvtUrl $ V.filter (\e -> start_date e < currentDay) events
-  V.forM_ urls createDirForResult
-  let files = V.forM urls fetchResult
-  -- TODO: parse and store results
+  let pastEvents = V.filter (\e -> start_date e < currentDay) events
+  V.forM_ pastEvents processResult
   putStrLn "finish"
 
 
