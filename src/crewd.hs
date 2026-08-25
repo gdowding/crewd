@@ -13,8 +13,9 @@ import Data.Csv
 import Data.List (intercalate, dropWhileEnd)
 import Data.List.Split (splitOn)
 import Data.Time.Clock (getCurrentTime, utctDay)
-import Data.Text (Text, pack, unpack)
+import qualified Data.Text as T
 import qualified Data.Text.Encoding as TE
+import qualified Data.Text.IO as TIO
 import Data.Time.Calendar (Day, toGregorian)
 import Data.Time.Format (defaultTimeLocale,  parseTimeM)
 import qualified Data.Vector as V
@@ -28,10 +29,10 @@ import Text.HTML.TagSoup
 
 
 data Event = Event
-  { regatta    :: !Text
-  , series     :: !Text
+  { regatta    :: !T.Text
+  , series     :: !T.Text
   , start_date :: !Day
-  , race       :: !Text
+  , race       :: !T.Text
   } deriving (Show, Generic)
 
 parseDate :: BS.ByteString -> Parser Day
@@ -94,7 +95,7 @@ getValuesFromResult r =
     tdPart = map (partitions (~== ("<td>" :: String))) $ drop 1 rows
     dataValues = map getRowData tdPart
   in
-    (dataHeadings, dataValues)  -- (dataHeadings, map getRowData tdPart)
+    (dataHeadings, dataValues)
 
 
 -- get header and results for a single class
@@ -110,6 +111,10 @@ getResults r =
 
 printTable :: [[String]] -> IO ()
 printTable table = putStr (unlines (map (intercalate ",") table))
+
+rowToCsv :: [String] -> String
+rowToCsv = intercalate ","
+
 
 getRaceInfo :: [Tag String] -> [[Char]]
 getRaceInfo t =
@@ -129,11 +134,11 @@ getEvtUrl Event {regatta = r, series = s, start_date = d, race =n} =
   raceInfo ++ regatta' ++ "/" ++ series' ++ "/" ++ year ++ "/" ++ "race" ++ race' ++ ".htm"
   where
     raceInfo = "https://race.styc.org/race_info/"
-    regatta' = map (\x -> if x == ' ' then '_' else x) $ unpack r
+    regatta' = map (\x -> if x == ' ' then '_' else x) $ T.unpack r
     (y, _, _) = toGregorian d
     year = show y
-    series'  = "Series" ++ unpack s
-    race' = unpack n
+    series'  = "Series" ++ T.unpack s
+    race' = T.unpack n
 
 ------------------------------------------------------------
 -- Manage download directory.
@@ -174,18 +179,25 @@ processResult event =
     -- Is this a race condition if multiple processes are attempting to create directory at same time?
     -- or is it thread safe?
     createDirectoryIfMissing True $ takeDirectory filePath
-    respBody <- fetchResult req filePath
-    let tags = parseTags $ unpack (TE.decodeUtf8 respBody)
+    -- respBody <- fetchResult req filePath
+    -- let tags = parseTags $ T.unpack (TE.decodeUtf8 respBody)
+    respBody <- TIO.readFile filePath
+    let tags = parseTags $ T.unpack  respBody
     let classes = partitions (~== ("<p class=classtitle>" :: String)) tags
-    let results = map getResults classes
-    let c1 = (fst . head) results
-    print filePath
-    printTable [c1]
+    let results = flattenSnd $ map getResults classes
+    let resultString = intercalate "\n" $ map rowToCsv results
+    let csvPath = filePath -<.> ".csv"
+    putStrLn filePath
+    putStrLn csvPath
+    -- putStrLn resultString
+    TIO.writeFile csvPath $ T.pack resultString
 
-
-
-
-    -- parse and save
+flattenSnd results =
+  let
+    (headList, _):_ = results
+    resultData = concatMap snd results
+  in
+    headList:resultData
 
 
 ------------------------------------------------------------
