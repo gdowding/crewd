@@ -27,14 +27,30 @@
               };
           })
         ];
+
         pkgs = import nixpkgs { inherit system overlays; inherit (haskellNix) config; };
         flake = pkgs.hixProject.flake {};
+
+        frontend = pkgs.buildNpmPackage {
+          pname = "frontend";
+          version = "0.1.0";
+          src = ./windward-racing;
+          npmDepsHash = "sha256-ISmmvj/aBSrMEJ6fbHP4cGN24JjEHEdqfXlh272HHXk=";
+          installPhase = ''
+            mkdir -p $out/dist
+            cp -r dist/* $out/dist/
+          '';
+        };
+
       in flake // {
         legacyPackages = pkgs;
 
         # `nix build .` builds the crewd executable; the per-component
         # attributes (e.g. `nix build .#crewd:exe:crewd`) come from `flake`.
-        packages = flake.packages // { default = flake.packages."crewd:exe:crewd"; };
+        packages = flake.packages // {
+          inherit frontend;
+          default = flake.packages."crewd:exe:crewd";
+        };
       });
 
   # --- Flake Local Nix Configuration ----------------------------

@@ -111,7 +111,7 @@ getHeadFromResult r =
          h = (\(x:_:xs) -> x : "Description" : xs) headings
          d = (\(x:_:xs) -> x : description : xs) values
      in
-       (h, d)
+         (h, d)
 
 getRowData row = map (escapeCSV . trimEnd . unwords . (map fromTagText)) $ map (filter isTagText) row
 
