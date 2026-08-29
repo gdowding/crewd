@@ -46,5 +46,3 @@ data
 doc/models.svg
 # Has some test data. Doesn't need to be in public repo.
 cli/data.bqn
-# Has some test data. Need to clean up.
-crewd.org

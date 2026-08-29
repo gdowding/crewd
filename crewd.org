@@ -1,0 +1,494 @@
+* what am I doing
+
+Tool to manage crew roster and events that require crew. This is basically a resource and scheduling project as well as require some self serve aspects.
+
+** I want to use org-mode to manage race data at least initially
+
+It is easy to work with, for me, and has some flexibility.
+
+** Here are some things I want to keep track of for a given race / day
+
+- need to contact current crew and see who is available and can commit
+- crew for each day
+- crew positions
+- need to plan delivery
+- register
+- race information
+  - notice of race
+  - sailing instructions
+  - addendums
+- conditions
+  - wind
+  - current
+  - sea state
+  - forcast
+  - acutal
+- results
+  - should be able to download results
+
+** weather api links from google search
+https://stormglass.io/marine-weather/
+https://api.windy.com
+https://open-meteo.com/en/docs/marine-weather-api
+https://www.weather.gov/documentation/services-web-api
+
+
+* haskell implementation
+
+I plan to implement in haskell and am planning using literate programming to create the code.
+
+#+begin_src haskell :noweb yes :tangle "src/crewd.hs"
+  <<crewd-hs>>
+#+end_src
+
+
+*** Preamble
+
+#+begin_src haskell :noweb-ref crewd-hs  :noweb yes tangle yes
+  {-# LANGUAGE OverloadedStrings #-}
+  {-# LANGUAGE DeriveGeneric #-}
+
+  module Main (main) where
+
+  <<imports>>
+
+  <<configuration>>
+
+#+end_src
+
+To keep things simple, I am defining the configuration information in the haskell source. Eventually this will be moved to an appropropriate location (file, environment variables, etc.).
+
+#+begin_src haskell :noweb-ref configuration
+  schedulePath = "/Users/gdowding/git/github/gdowding/crewd/schedule.csv"
+  downloadDirectory = "/Users/gdowding/git/github/gdowding/crewd/results"
+  raceInfo = "https://race.styc.org/race_info/"
+#+end_src
+
+** crewd.hs
+:PROPERTIES:
+:header-args: :noweb-ref crewd-hs
+:END:
+
+*** Events
+
+Events are what the schedule is composed of. Initially events are races and are generally one day. There could be multiple races on that day. Or an event could span multiple days. In the simplest an event corresponds to a single race on a single day.
+
+#+begin_src haskell :noweb-ref imports
+  import qualified Data.Text as T
+  import Data.Time.Calendar (Day)
+  import GHC.Generics (Generic)
+#+end_src
+
+#+name: event
+#+begin_src haskell
+  data Event = Event
+    { regatta    :: !T.Text
+    , series     :: !T.Text
+    , start_date :: !Day
+    , race       :: !T.Text
+    } deriving (Show, Generic)
+
+#+end_src
+
+I am storing the schedule in a CSV file.
+
+#+begin_src haskell :noweb-ref imports
+  import Data.Csv
+  import qualified Data.ByteString as BS
+  import qualified Data.ByteString.Char8 as BC
+  import Data.Time.Format (defaultTimeLocale,  parseTimeM)
+#+end_src
+
+This directive makes the Event type readable from a CSV file.
+
+#+begin_src haskell
+  instance FromNamedRecord Event
+
+#+end_src
+
+Converting the =start_date= field to a day instance requires cusom parsing.
+
+TODO: should be able to change this to =Just day= instead of =pure day=
+
+#+begin_src haskell
+parseDate :: BS.ByteString -> Parser Day
+parseDate s =
+  case parseTimeM True defaultTimeLocale "%Y-%m-%d" (BC.unpack s) of
+    Just day -> pure day
+    Nothing -> fail $ "Could not parse ISO-8601 date: " ++ BC.unpack s
+
+instance FromField Day where
+  parseField = parseDate
+
+#+end_src
+
+** Results
+
+Processing results involved downloading the raw data and saving it locally, then parsing to a tabular format and storing that locally in a CSV format. Here is the sequence to process a single event. It is implemented for Ballard Cup (see below), but this is the basis for getting results into a usable format.
+
+#+begin_src haskell :noweb-ref imports
+  import Text.HTML.TagSoup
+  import System.Directory (createDirectoryIfMissing)
+  import System.FilePath ((</>), (-<.>), dropDrive, takeFileName, takeDirectory)
+  import Data.List (intercalate)
+  import qualified Data.Text.IO as TIO
+  import Network.HTTP.Simple
+#+end_src
+
+#+begin_src haskell :noweb-ref crewd-hs
+  processResult event =
+    do
+      let url = getEvtUrl event
+      req <- parseRequest url
+      let filePath = localPath req
+      -- Is this a race condition if multiple processes are attempting to create directory at same time?
+      -- or is it thread safe?
+      createDirectoryIfMissing True $ takeDirectory filePath
+      -- respBody <- fetchResult req filePath
+      -- let tags = parseTags $ T.unpack (TE.decodeUtf8 respBody)
+      respBody <- TIO.readFile filePath
+      let tags = parseTags $ T.unpack  respBody
+      let classes = partitions (~== ("<p class=classtitle>" :: String)) tags
+      let results = flattenSnd $ map getResults classes
+      let resultString = intercalate "\n" $ map rowToCsv results
+      let csvPath = filePath -<.> ".csv"
+      putStrLn filePath
+      putStrLn csvPath
+      -- putStrLn resultString
+      TIO.writeFile csvPath $ T.pack resultString
+
+#+end_src
+
+The way I decided to return the processing of the Ballard Cup results is to return a tuple of =(header, data)= where header is a list of headings and data is a list of lists containing the data for the results. When writing out the file, I only want one header for the entire file. =flattenSnd= flattens the results for each class and throws away the header.
+
+#+begin_src haskell :noweb-ref crewd-hs
+  flattenSnd results =
+    let
+      (headList, _):_ = results
+      resultData = concatMap snd results
+    in
+      headList:resultData
+
+#+end_src
+
+*** Ballard Cup
+
+I am starting with Ballard Cup since this is the series that I am currently participating in.
+
+The results are available from a static web site. It is pretty straight forward to generate the URL to the results based on the event.
+
+The main result page gives the completed races for the series broken down by each class.
+
+https://race.styc.org/race_info/Ballard_Cup/SeriesIII/2026/series.htm?t=326760
+
+This page has links to individual race results. I prefer this page since it has the timing information. This is useful for tracking progress through the series.
+
+Race 1
+https://race.styc.org/race_info/Ballard_Cup/SeriesIII/2026/race1.htm
+
+Race 2
+https://race.styc.org/race_info/Ballard_Cup/SeriesIII/2026/race2.htm
+
+
+Here is the implementation of converting an event to a URl that can be used to download the results. This applies only to Ballard Cup events. The function =raceInfo= is defined in the configuration section.
+
+#+begin_src haskell :noweb-ref imports
+  import Data.Time.Calendar (toGregorian)
+#+end_src
+
+#+begin_src haskell :noweb-ref crewd-hs
+  getEvtUrl :: Event -> String
+  getEvtUrl Event {regatta = r, series = s, start_date = d, race = n} =
+    raceInfo ++ regatta' ++ "/" ++ series' ++ "/" ++ year ++ "/" ++ "race" ++ race' ++ ".htm"
+    where
+      regatta' = map (\x -> if x == ' ' then '_' else x) $ T.unpack r
+      (y, _, _) = toGregorian d
+      year = show y
+      series'  = "Series" ++ T.unpack s
+      race' = T.unpack n
+
+#+end_src
+
+Getting results for a single class of a Ballard Cup. The classes are extracted in =processResult= the resulting list is mapped over =getResults=. The return type is a tuple of =(header, data)=. I'm not totally happy with that, but it seems like the right thing to return when zoomed into what this function is responsible for.
+
+#+begin_src haskell
+let classes = partitions (~== ("<p class=classtitle>" :: String)) tags
+#+end_src
+
+#+begin_src haskell :noweb-ref crewd-hs
+getResults :: [Tag String] -> ([String], [[String]])
+getResults r =
+  let (cHead, cData) = getHeadFromResult r
+      (dHead, dValues) = getValuesFromResult r
+      classDataValues = map (\d -> cData ++ d) dValues
+  in
+    (cHead ++ dHead, classDataValues)
+
+#+end_src
+
+Get the headings. TODO: include example heading of what is being parsed.
+
+#+begin_src haskell :noweb-ref imports
+import Data.List.Split (splitOn)
+#+end_src
+
+#+begin_src haskell :noweb-ref crewd-hs
+  classFromSect s = unwords . words . innerText . drop 1  $ take 2 s
+
+  -- get heading data from single class result
+  getHeadFromResult r =
+       let classTitle = classFromSect r
+           -- split into fields and remove separators
+           classFields = splitOn " - " classTitle
+           fields = map (\h -> (fst h, dropWhile (\c -> c == ':' || c == ' ') $ snd h)) $ map (break (== ':')) classFields
+           -- transpose from [(field1, data1) ...] to [[field1, ...], [data1, ...]
+           headings =  map (escapeCSV . fst) fields
+           values = map (escapeCSV . snd) fields
+           -- clean up the second column by adding a field name and using the supplied field name as data.
+           description = headings !! 1
+           h = (\(x:_:xs) -> x : "Description" : xs) headings
+           d = (\(x:_:xs) -> x : description : xs) values
+       in
+         (h, d)
+
+#+end_src
+
+Get values from result
+
+#+begin_src haskell :noweb-ref imports
+import Data.Char (isSpace)
+#+end_src
+
+#+begin_src haskell :noweb-ref crewd-hs
+  getRowData row = map (escapeCSV . trimEnd . unwords . (map fromTagText)) $ map (filter isTagText) row
+
+  getDataHeadings th = escapeCSV . unwords $ filter (not . null) $ map (filter (not . isSpace)) $ map fromTagText $ filter isTagText th
+
+  getValuesFromResult :: [Tag [Char]] -> ([String], [[String]])
+  getValuesFromResult r =
+    let
+      block = takeWhile (~/= ("</table>" :: String)) r
+      rows = partitions (~== ("<tr>" :: String)) block
+      th = partitions (~== ("<th>" :: String)) $ head rows
+      dataHeadings = map getDataHeadings th
+      tdPart = map (partitions (~== ("<td>" :: String))) $ drop 1 rows
+      dataValues = map getRowData tdPart
+    in
+      (dataHeadings, dataValues)
+
+
+#+end_src
+
+*** String functions
+
+#+begin_src haskell :noweb-ref imports
+import Data.List (dropWhileEnd)
+#+end_src
+
+#+begin_src haskell :noweb-ref crewd-hs
+trimEnd :: String -> String
+trimEnd = dropWhileEnd isSpace
+
+#+end_src
+
+*** CSV Output Support
+
+Convert a row (list of strings) to a single CSV string. Possibly this is where I could perform =escapeCSV=
+
+#+begin_src haskell :noweb-ref crewd-hs
+rowToCsv :: [String] -> String
+rowToCsv = intercalate ","
+
+#+end_src
+
+Need to handle embeded ',' and '"'. I'm escaping pretty early on when processing the data. I would prefer to do it later as when outputing to CSV. Currently this is being called as the data is parsed.
+
+#+begin_src haskell :noweb-ref crewd-hs
+  escapeCSV :: [Char] -> [Char]
+  escapeCSV = wrapDoubleQuote . escapeQuotes
+    where
+      wrapDoubleQuote s' = "\"" ++ s' ++ "\""
+      escapeQuotes = concatMap (\c -> if c == '"' then "\"\"" else [c])
+
+#+end_src
+
+*** Local File Management
+
+Convert a request to a local path. The idea is to use store files in the a directory that is named as download_dir/host/urlpath/
+
+#+begin_src haskell :noweb-ref imports
+import qualified Network.HTTP.Client as CL
+#+end_src
+
+#+begin_src haskell :noweb-ref crewd-hs
+localPath req =
+  downloadDirectory </> filePath
+  where
+    reqHost = BC.unpack $ CL.host req
+    reqPath = BC.unpack $ CL.path req
+    filePath = reqHost </> dropDrive reqPath
+
+#+end_src
+
+
+** Pipeline
+
+#+begin_src haskell :noweb-ref imports
+import Data.Time.Clock (getCurrentTime, utctDay)
+#+end_src
+
+#+begin_src haskell :noweb-ref crewd-hs
+  -- Only process events that have already occoured.
+  runPipeline :: V.Vector Event -> IO ()
+  runPipeline events = do
+    currentDay <- utctDay <$> getCurrentTime
+    let pastEvents = V.filter (\e -> start_date e < currentDay) events
+    V.forM_ pastEvents processResult
+    putStrLn "finish"
+
+#+end_src
+
+** Main
+
+The main function runs a schedule then calls the pipeline to download results, parse them, then store the parsed results in a CSV.
+
+#+begin_src haskell :noweb-ref imports
+  import qualified Data.Vector as V
+  import qualified Data.ByteString.Lazy as BL
+  import System.Exit as Exit
+
+#+end_src
+
+
+#+begin_src haskell :noweb-ref crewd-hs
+main :: IO ()
+main = do
+  do
+    csvData <- BL.readFile schedulePath
+    case decodeByName csvData of
+      Left err -> Exit.die err
+      Right(_, v) -> runPipeline (v :: V.Vector Event)
+
+#+end_src
+
+* development environment
+
+I'm using nix to set up a development environment
+
+
+* deployment
+** set up deploy through push
+
+- backend server
+- implement frontend in haskell?
+
+*** frontend
+Current frontend is Ract + Vite. This is all pretty much generated by AI
+
+It is deployed to vercel
+
+https://vercel.com/irie2
+
+I have connected the github repo to vercel
+
+Looks like there is a way to connect a database to vercel as well. Not sure if that is really needed or not.
+
+*** Database
+supabase
+
+https://supabase.com/dashboard/org/olbomtdfdiaahnwfzgfj
+
+can get connectio string here https://supabase.com/dashboard/project/gzhojmodmhyutkcyqkos/integrations/vault/overview?showConnect=true&connectTab=direct
+
+
+*** backend
+
+If I stick with haskell, it looks like I need to build a container. I can build it with nix
+
+Options for deploying using docker
+
+- railway
+- koyeb
+- google cloud run
+
+
+Another option is to set up a VM server and install to that
+
+*** combine frontend and backend on single server
+
+Right now the frontend only gets data from the database. It does not call any server APIs. In theory could just have the backend do updates to the database.
+
+
+
+
+* misc
+
+** TODO explain how to get nix to work with emacs so that it gets the correct compilation tools
+** TODO add results to events
+
+- [ ] backend
+  - [ ] schedule pipeline to process results
+  - [ ] download and store results for event
+  - [ ] file storage for unstructured data
+  - [ ] file storage for parsed data as csv
+  - [ ] table or query layer for api access
+- [ ] frontend
+  - [ ] get results if event has occourd and results available
+  - [ ] summary show place on main screen: class, course, and place
+  - [ ] event detail show all results for single race
+  - [ ] series show all results for series
+  - [ ] performance show chart of corrected time behind
+
+
+*** Top level path
+
+I have decided to use the URL as the basis for the location for storing source files. This results in a direct relation between the location of the source data and the location of the local data. Maybe I can add a configuration value to modify this if it results in weird path names.
+
+<host>/<url path>/<url filename>
+
+*** Unstructured / source data
+
+Using the filename provided by the url. Will need to figure something out if there is no file name. Also need some way of identifying the filename for the results.
+
+*** Semistructured / parsed data
+
+undecided. for now will use same filename with .csv extension
+
+*** Database
+
+Do I need a database?
+
+- [ ] ingest to table that matches csv file
+- [ ] clean to fix data types and handle cases like DNC in place column
+- [ ] common table with normalized result format
+
+*** download event
+
+Should have list of events with start dates and finish time
+
+When event has completed poll for results until available or stop after some limit
+
+process data and update state of event
+
+** TODO configuration management
+
+- download location
+
+** TODO document adding a haskell dependency
+
+- add to build-depends in crewd.cabal
+- re-trigger nix develop
+
+Create directory for downloading results. Use the URL as a guide for directory and file naming.
+
+
+* 2026 Schedule
+#+name: 2026-schedule
+| regatta     | series | start_date | race | class |
+|-------------+--------+------------+------+-------|
+| Ballard Cup | III    | 2026-07-27 |    1 |     8 |
+| Ballard Cup | III    | 2026-08-03 |    2 |     8 |
+| Ballard Cup | III    | 2026-08-10 |    3 |     8 |
+| Ballard Cup | III    | 2026-08-17 |    4 |     8 |
+| Ballard Cup | III    | 2026-08-24 |    5 |     8 |
+| Ballard Cup | III    | 2026-08-31 |    6 |     8 |
