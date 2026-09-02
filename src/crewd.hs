@@ -3,18 +3,17 @@
 
 module Main (main) where
 
-import qualified Data.Text as T
-import Data.Time.Calendar (Day)
-import GHC.Generics (Generic)
-import Data.Csv
-import qualified Data.ByteString as BS
 import qualified Data.ByteString.Char8 as BC
-import Data.Time.Format (defaultTimeLocale,  parseTimeM)
+import qualified Data.Text as T
+
+import Schedule
 import Text.HTML.TagSoup
 import System.Directory (createDirectoryIfMissing)
 import System.FilePath ((</>), (-<.>), dropDrive, takeFileName, takeDirectory)
 import Data.List (intercalate)
+import qualified Data.ByteString as BS
 import qualified Data.Text.IO as TIO
+import qualified Data.Text.Encoding as TE
 import Network.HTTP.Simple
 import Data.Time.Calendar (toGregorian)
 import Data.List.Split (splitOn)
@@ -31,23 +30,14 @@ schedulePath = "/Users/gdowding/git/github/gdowding/crewd/schedule.csv"
 downloadDirectory = "/Users/gdowding/git/github/gdowding/crewd/results"
 raceInfo = "https://race.styc.org/race_info/"
 
-data Event = Event
-  { regatta    :: !T.Text
-  , series     :: !T.Text
-  , start_date :: !Day
-  , race       :: !T.Text
-  } deriving (Show, Generic)
+-- fetch result. Save result to filePath and return body of response.
 
-instance FromNamedRecord Event
-
-parseDate :: BS.ByteString -> Parser Day
-parseDate s =
-  case parseTimeM True defaultTimeLocale "%Y-%m-%d" (BC.unpack s) of
-    Just day -> pure day
-    Nothing -> fail $ "Could not parse ISO-8601 date: " ++ BC.unpack s
-
-instance FromField Day where
-  parseField = parseDate
+fetchResult req filePath =
+  do
+    response <- httpBS req
+    let bodyContent = getResponseBody response
+    BS.writeFile filePath bodyContent
+    return $ TE.decodeUtf8 bodyContent
 
 processResult event =
   do
@@ -57,9 +47,9 @@ processResult event =
     -- Is this a race condition if multiple processes are attempting to create directory at same time?
     -- or is it thread safe?
     createDirectoryIfMissing True $ takeDirectory filePath
-    -- respBody <- fetchResult req filePath
-    -- let tags = parseTags $ T.unpack (TE.decodeUtf8 respBody)
-    respBody <- TIO.readFile filePath
+    -- either get body from url or read from file.
+    respBody <- fetchResult req filePath
+    -- respBody <- TIO.readFile filePath
     let tags = parseTags $ T.unpack  respBody
     let classes = partitions (~== ("<p class=classtitle>" :: String)) tags
     let results = flattenSnd $ map getResults classes
@@ -159,8 +149,7 @@ runPipeline events = do
 
 main :: IO ()
 main = do
-  do
-    csvData <- BL.readFile schedulePath
-    case decodeByName csvData of
-      Left err -> Exit.die err
-      Right(_, v) -> runPipeline (v :: V.Vector Event)
+  csvData <- BL.readFile schedulePath
+  case readEventCSV csvData of
+    Left err -> Exit.die err
+    Right(_, v) -> runPipeline (v :: V.Vector Event)

@@ -18,6 +18,7 @@ description:
 executable crewd
   hs-source-dirs: src
   main-is: crewd.hs
+  other-modules: Schedule
   build-depends:
                 base >= 4.2 && < 5,
                 bytestring,
