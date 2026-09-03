@@ -1,5 +1,4 @@
 {-# LANGUAGE DataKinds #-}
-{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE TypeOperators #-}
 
 module Main where
@@ -11,35 +10,37 @@ import GHC.Generics
 import Network.Wai
 import Network.Wai.Handler.Warp
 import Servant
-
-type UserAPI = "users" :> Get '[JSON] [User]
-
-data SortBy = Age | Name
-
-data User = User
-            { name :: !String
-            , age :: !Int
-            , email :: !String
-            , registration_date :: !Day
-            } deriving (Eq, Show, Generic)
-
-instance ToJSON User
+import qualified Data.Vector as V
+import qualified Data.ByteString.Lazy as BL
+import System.Exit as Exit
+import Schedule
 
 
-users :: [User]
-users =  [ User "Isaac Newton"    372 "isaac@newton.co.uk" (fromGregorian 1683  3 1)
-         , User "Albert Einstein" 136 "ae@mc2.org"         (fromGregorian 1905 12 1)
-         ]
+type ScheduleAPI = "schedule" :> Get '[JSON] [Event]
 
+instance ToJSON Event
 
-server :: Server UserAPI
-server = return users
+server :: [Event] -> Server ScheduleAPI
+server = return
 
-userAPI :: Proxy UserAPI
-userAPI = Proxy
+scheduleAPI :: Proxy ScheduleAPI
+scheduleAPI = Proxy
 
-app :: Application
-app = serve userAPI server
+app :: [Event] -> Application
+app events = serve scheduleAPI (server events)
+
+schedulePath = "/Users/gdowding/git/github/gdowding/crewd/schedule.csv"
+downloadDirectory = "/Users/gdowding/git/github/gdowding/crewd/results"
+raceInfo = "https://race.styc.org/race_info/"
+
+runServer schedData = do
+  (_, events) <- readEventCSV schedData
+  return $ run 8081 (app (V.toList events))
+
 
 main :: IO ()
-main = run 8081 app
+main = do
+  csvData <- BL.readFile schedulePath
+  case runServer csvData of
+    Left err -> Exit.die err
+    Right io -> io

@@ -425,10 +425,12 @@ Read in the schedule. This mud be done within a do block.
 
 
 * http server
+:PROPERTIES:
+:GPTEL_TOPIC: http-server
+:END:
 
-#+begin_src haskell : noweb yes :tangle "src/screwd.hs"
+#+begin_src haskell :noweb yes :tangle "src/screwd.hs"
   {-# LANGUAGE DataKinds #-}
-  {-# LANGUAGE DeriveGeneric #-}
   {-# LANGUAGE TypeOperators #-}
 
   module Main where
@@ -440,39 +442,99 @@ Read in the schedule. This mud be done within a do block.
   import Network.Wai
   import Network.Wai.Handler.Warp
   import Servant
-
-  type UserAPI = "users" :> Get '[JSON] [User]
-
-  data SortBy = Age | Name
-
-  data User = User
-              { name :: !String
-              , age :: !Int
-              , email :: !String
-              , registration_date :: !Day
-              } deriving (Eq, Show, Generic)
-
-  instance ToJSON User
+  <<screwd-imports>>
 
 
-  users :: [User]
-  users =  [ User "Isaac Newton"    372 "isaac@newton.co.uk" (fromGregorian 1683  3 1)
-           , User "Albert Einstein" 136 "ae@mc2.org"         (fromGregorian 1905 12 1)
-           ]
+  type ScheduleAPI = "schedule" :> Get '[JSON] [Event]
 
+  instance ToJSON Event
 
-  server :: Server UserAPI
-  server = return users
+  server :: [Event] -> Server ScheduleAPI
+  server = return
 
-  userAPI :: Proxy UserAPI
-  userAPI = Proxy
+  scheduleAPI :: Proxy ScheduleAPI
+  scheduleAPI = Proxy
 
-  app :: Application
-  app = serve userAPI server
+  app :: [Event] -> Application
+  app events = serve scheduleAPI (server events)
 
-  main :: IO ()
-  main = run 8081 app
+  <<configuration>>
+
+  <<screwd-main>>
 #+end_src
+
+Now I want to read in the schedule and serve that as JSON.
+
+First import the Schedule module and other required modules.
+
+#+name: screwd-imports
+#+begin_src haskell
+  import qualified Data.Vector as V
+  import qualified Data.ByteString.Lazy as BL
+  import System.Exit as Exit
+  import Schedule
+#+end_src
+
+
+#+name: screwd-main
+#+begin_src haskell
+runServer schedData = do
+  (_, events) <- readEventCSV schedData
+  return $ run 8081 (app (V.toList events))
+
+
+main :: IO ()
+main = do
+  csvData <- BL.readFile schedulePath
+  case runServer csvData of
+    Left err -> Exit.die err
+    Right io -> io
+#+end_src
+
+
+How do I read in a file schedule.csv and return the data in the server function. I already have a module that will read the CSV file into a Vector of Event
+
+#+begin_reasoning
+**Initiating the Task**
+
+I'm now diving into the user's request. My focus is on loading `schedule.csv` into a `Vector Event` data structure. I'm taking stock of the existing `Schedule` module for CSV parsing, to leverage that effectively.
+
+
+**Refining Data Access**
+
+I've revised the API, ensuring it aligns with `ScheduleAPI` instead of `UserAPI`. I'm now exploring two distinct methods for file access. Option 1 involves loading CSV data at startup, passing it to the server. Alternatively, Option 2 will read the CSV dynamically within the server handler using `liftIO`, which is suitable for changing data. I'm leaning toward Option 1, for static data, but I've drafted code changes for both approaches.
+
+
+
+#+end_reasoning
+
+To serve the CSV data, you have two options: read the file on every request, or read it once at startup (recommended for performance).
+
+Since your API expects a list (=[Event]=) but your module returns a =Vector Event=, you will also need to convert it using =Data.Vector.toList=.
+
+*** Option 1: Read once at startup (Recommended)
+Pass the loaded data from =main= into your =server= function.
+
+#+begin_src haskell
+import qualified Data.Vector as V
+
+-- 1. Update server to accept the events
+server :: [Event] -> Server ScheduleAPI
+server events = return events
+
+-- 2. Update app to accept and pass the events
+app :: [Event] -> Application
+app events = serve scheduleAPI (server events)
+
+-- 3. Read the file in main and pass it down
+main :: IO ()
+main = do
+  -- Replace `readEvents` with your actual Schedule module function
+  eventsVec <- readEvents "schedule.csv"
+  let events = V.toList eventsVec
+  run 8081 (app events)
+#+end_src
+
 
 * development environment
 
@@ -710,3 +772,52 @@ Another option is to set up a VM server and install to that
 *** combine frontend and backend on single server
 
 Right now the frontend only gets data from the database. It does not call any server APIs. In theory could just have the backend do updates to the database.
+
+* haskell
+
+** extracting value from either
+
+In haskell, I am calling a function that returns an Either. How do I propegate the error if it is a Left or access the data if it is a Right?
+
+#+begin_reasoning
+**Defining the Strategy**
+
+Okay, I'm now zeroing in on the core challenge: handling the `Either` type in Haskell. The goal is clear - either pass on the `Left` (error) or extract the `Right` (value). This is where the real work begins, and I am beginning to devise potential approaches.
+
+
+**Evaluating the Techniques**
+
+I am now comparing different solutions for dealing with the `Either` type in Haskell. I've considered monadic binding (`do` notation) as the most idiomatic option, and pattern matching for explicit control. I'm focusing on concisely presenting both the `do` notation and the `case` statement to illustrate the two methods. I am now also considering a scenario where the surrounding function might also return `Either e a`.
+
+
+
+#+end_reasoning
+
+The most idiomatic way is using *=do= notation*. Since =Either= is a Monad, using =<-= will automatically extract the =Right= value or short-circuit and propagate the =Left= error.
+
+/(Note: Your enclosing function must also return an =Either= with the same error type)./
+
+#+begin_src haskell
+myFunction :: Either String Int
+myFunction = do
+  val <- functionReturningEither  -- extracts Right, or immediately returns Left
+  return (val + 1)
+#+end_src
+
+If you need explicit control (or if your enclosing function returns a different type), use *pattern matching* with a =case= expression:
+
+#+begin_src haskell
+myFunction :: Either String Int
+myFunction =
+  case functionReturningEither of
+    Left err  -> Left err          -- propagate error
+    Right val -> Right (val + 1)   -- access and use data
+#+end_src
+
+For simple transformations of the =Right= value while automatically passing =Left= through, you can use =fmap= (or =<$>=):
+
+#+begin_src haskell
+myFunction :: Either String Int
+myFunction = (+ 1) <$> functionReturningEither
+#+end_src
+How do I extract the value
