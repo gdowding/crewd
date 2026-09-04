@@ -21,12 +21,19 @@
               final.haskell-nix.hix.project {
                 src = ./.;
                 evalSystem = "aarch64-darwin";
-                shell.tools = {
-                  haskell-language-server = {};
+                shell = {
+                  tools = {
+                    haskell-language-server = {};
+                  };
+                  buildInputs = with final.elmPackages; [
+                    elm
+                    elm-format
+                    elm-language-server
+                  ];
                 };
               };
           })
-        ];
+                   ];
 
         pkgs = import nixpkgs { inherit system overlays; inherit (haskellNix) config; };
         flake = pkgs.hixProject.flake {};
@@ -34,8 +41,9 @@
         frontend = pkgs.buildNpmPackage {
           pname = "frontend";
           version = "0.1.0";
-          src = ./windward-racing;
+          src = ./frontend;
           npmDepsHash = "sha256-ISmmvj/aBSrMEJ6fbHP4cGN24JjEHEdqfXlh272HHXk=";
+          nativeBuildInputs = [ pkgs.elmPackages.elm ];
           installPhase = ''
             mkdir -p $out/dist
             cp -r dist/* $out/dist/

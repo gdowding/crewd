@@ -1,12 +1,17 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { Users, ExternalLink, CheckCircle, XCircle, HelpCircle, Filter, LogIn, LogOut, User, Edit3, Loader2 } from 'lucide-react';
-import { SCHEDULE_DATA } from './data/schedule.js';
 import AuthModal from './components/AuthModal.jsx';
 import ProfileModal from './components/ProfileModal.jsx';
 import { supabase } from './lib/supabase.js';
 
 export default function App() {
-  const [events] = useState(SCHEDULE_DATA);
+  // events
+  // const [events] = useState(SCHEDULE_DATA);
+  const [events, SetSchedule] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  // Attendence
   const [rsvpState, setRsvpState] = useState({});
   const [attendeesByEvent, setAttendeesByEvent] = useState({});
   const [savingEventId, setSavingEventId] = useState(null);
@@ -20,6 +25,27 @@ export default function App() {
   const getDisplayName = (user) => {
     return user?.user_metadata?.username || user?.email?.split('@')[0] || 'Crew';
   };
+
+  useEffect(() => {
+      const url = 'localhost:8081/schedule';
+
+      fetch(url)
+	  .then((response) => {
+	      if (!response.ok) {
+		  throw new Error('Network response was not ok');
+	      }
+	      return response.json();
+	  })
+	  .then((data) => {
+	      setSchedule(data);
+	      setLoading(false);
+	  })
+	  .catch((err) => {
+	      setError(err);
+	      setLoading(false);
+	  });
+  }, []);
+
 
   // Fetch RSVPs from database without setting triggering dependencies
   const loadRsvps = useCallback(async (userId) => {
@@ -141,12 +167,13 @@ export default function App() {
   const fourWeeksLater = new Date(today);
   fourWeeksLater.setDate(today.getDate() + 28);
 
-  const displayedEvents = showAllEvents
-    ? events
-    : events.filter(evt => {
-        const eventDate = new Date(evt.startDate);
-        return eventDate >= today && eventDate <= fourWeeksLater;
-      });
+  const displayedEvents = events;
+  // const displayedEvents = showAllEvents
+  //   ? events
+  //   : events.filter(evt => {
+  //       const eventDate = new Date(evt.startDate);
+  //       return eventDate >= today && eventDate <= fourWeeksLater;
+  //     });
 
   return (
     <div className="min-h-screen bg-slate-900 text-slate-100 font-sans">
@@ -217,6 +244,7 @@ export default function App() {
             const combinedCrew = Array.from(new Set([...(evt.crew || []), ...dbAttendees]));
             const isSaving = savingEventId === evt.id;
 
+	    // TODO: refactor to use json schedule
             return (
               <div key={evt.id} className="bg-slate-800 p-5 rounded-lg border border-slate-700 hover:border-slate-600 transition flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div className="flex-1 space-y-1">
