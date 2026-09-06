@@ -17,7 +17,7 @@ data Event = Event
   , series     :: !T.Text
   , start_date :: !Day
   , race       :: !T.Text
-  } deriving (Show, Generic)
+  } deriving (Show, Generic, Eq)
 
 instance FromNamedRecord Event
 
