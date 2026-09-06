@@ -3,6 +3,7 @@
   inputs.haskellNix.url = "github:input-output-hk/haskell.nix";
   inputs.nixpkgs.follows = "haskellNix/nixpkgs-unstable";
   inputs.flake-utils.url = "github:numtide/flake-utils";
+
   outputs = { self, nixpkgs, flake-utils, haskellNix }:
     let
       supportedSystems = [
@@ -25,11 +26,6 @@
                   tools = {
                     haskell-language-server = {};
                   };
-                  buildInputs = with final.elmPackages; [
-                    elm
-                    elm-format
-                    elm-language-server
-                  ];
                 };
               };
           })
