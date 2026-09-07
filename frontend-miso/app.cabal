@@ -44,6 +44,7 @@ executable app
   build-depends:
     base < 5,
     miso >= 1.9,
+    miso-ui,
     crewd,
     text,
     time
