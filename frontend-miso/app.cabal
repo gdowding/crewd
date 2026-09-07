@@ -45,6 +45,7 @@ executable app
     base < 5,
     miso >= 1.9,
     crewd,
+    text,
     time
   hs-source-dirs:
     app
