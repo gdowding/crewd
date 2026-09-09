@@ -74,20 +74,26 @@ crewDevent = component m u v
       HE.div_
       [ HP.class_ "flex-1 space-y-1"
       ]
-      [
-        HE.span_
-        [ HP.class_ "text-xs uppercase font-bold tracking-wider text-orange-400"
+      [ HE.div_
+        [ HP.class_ "flex items-center space-x-2"
         ]
-        [ text $ ms $ eventName e
-        ]
-      , HE.span_
-        [ HP.class_ "text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded uppercase font-semibold"
-        ]
-        [ " STYC"
+        [
+          HE.span_
+          [ HP.class_ "text-xs uppercase font-bold tracking-wider text-orange-400"
+          ]
+          [ text $ ms $ eventName e
+          ]
+        , HE.span_
+          [ HP.class_ "text-[10px] bg-slate-700 text-slate-300 px-2 py-0.5 rounded uppercase font-semibold"
+          ]
+          [ " STYC"
+          ]
         ]
       , HE.h3_ [HP.class_ "text-lg font-semibold text-white"] ["Race ", text . ms $ S.race e]
+
       , HE.p_ [HP.class_ "text-xs text-slate-400"] [text . ms . show $ S.start_date e]
       ]
+
 
     eventCrew _e =
       let
